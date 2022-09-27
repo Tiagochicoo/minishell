@@ -18,7 +18,7 @@ LIB         = libft/libft.a
 
 all :
 	@make -s -C libft
-	@$(CC) $(CFLAGS) $(SRCS) $(LIB) -o $(MINISHELL)
+	@$(CC) $(CFLAGS) $(SRCS) $(LIB) -o $(MINISHELL) -lreadline
 	@printf "\e[38;5;46m ╔════════════════════════════════════╗\e[0m\n"
 	@printf "\e[38;5;46m█▓▒░         Compiled Libft         ░▒▓█ \e[0m\n"
 	@printf "\e[38;5;46m█▓▒░   Minishell build successful   ░▒▓█ \e[0m\n"

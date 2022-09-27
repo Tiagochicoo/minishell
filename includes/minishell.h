@@ -28,11 +28,27 @@
 
 typedef struct s_data
 {
+	char	**argv2;
+	char	*pwd;
+	char	*rel_pwd;
 	char	*buffer;
 	char	**cmds;
 	int		cmd_count;
 	char	*env;
 	
 }	t_data;
+
+typedef struct s_command
+{
+	char	*str;
+	char	**env;
+	char	**argv;
+	int		fd_in;
+	int		fd_out;
+	char	*file_name;
+}	t_command;
+
+
+
 
 #endif
