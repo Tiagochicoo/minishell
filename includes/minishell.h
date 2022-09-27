@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/09/25 19:17:20 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/09/27 15:47:32 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,6 @@ typedef struct s_data
 	int		cmd_count;
 	char	*env;
 	
-} t_data;
+}	t_data;
 
 #endif
