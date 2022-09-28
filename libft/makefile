@@ -1,12 +1,12 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
+#    makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/02/08 22:20:21 by tpereira          #+#    #+#              #
-#    Updated: 2021/09/17 18:29:02 by tpereira         ###   ########.fr        #
+#    Updated: 2022/09/28 21:54:37 by tpereira         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,7 @@ clean:
 soclean:    clean
 	rm -f $(SO)
 fclean:     clean
-	rm -f $(NAME)
+	rm -f $(NAME) libft*
 	rm -f $(SO)
 re:         fclean all
 so:         $(OBJS) 

@@ -6,7 +6,7 @@
 #    By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/22 16:50:02 by tpereira          #+#    #+#              #
-#    Updated: 2022/09/27 15:12:46 by tpereira         ###   ########.fr        #
+#    Updated: 2022/09/28 21:52:19 by tpereira         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,6 +33,6 @@ clean :
 
 fclean : clean
 	@make -s fclean -C libft
-	@rm -rf $(MINISHELL)
+	@rm -rf $(MINISHELL)*
 
 re : fclean all

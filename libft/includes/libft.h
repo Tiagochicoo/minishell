@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/08 23:02:16 by tpereira          #+#    #+#             */
-/*   Updated: 2022/02/20 17:50:51 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/09/28 21:41:58 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ char			*ft_strnew(size_t size);
 char			*ft_strndup(const char *str, size_t n);
 int				ft_putwstr(wchar_t *ws);
 int				ft_countletter(char *str, char c);
+int				ft_count(char **str);
 char			*ft_itoabase_umax(size_t num, int base);
 char			*ft_chrtostr(char c);
 size_t			ft_wstrlen(const wchar_t *s);
