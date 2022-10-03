@@ -6,19 +6,19 @@
 #    By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/22 16:50:02 by tpereira          #+#    #+#              #
-#    Updated: 2022/09/28 21:52:19 by tpereira         ###   ########.fr        #
+#    Updated: 2022/10/03 22:34:10 by tpereira         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 MINISHELL   = minishell
 CC          = gcc
-CFLAGS      = -Wall -Wextra -Werror -g -lreadline
+CFLAGS      = -Wall -Wextra -Werror -g -lreadline -L /opt/homebrew/Cellar/readline/8.1.2/lib/ -I /opt/homebrew/Cellar/readline/8.1.2/include
 SRCS        = ./srcs/*.c
 LIB         = libft/libft.a
 
 all :
 	@make -s -C libft
-	@$(CC) $(CFLAGS) $(SRCS) $(LIB) -o $(MINISHELL) -lreadline
+	@$(CC) $(CFLAGS) $(SRCS) $(LIB) -o $(MINISHELL) -lreadline -L /opt/homebrew/Cellar/readline/8.1.2/lib/ -I /opt/homebrew/Cellar/readline/8.1.2/include
 	@printf "\e[38;5;46m ╔════════════════════════════════════╗\e[0m\n"
 	@printf "\e[38;5;46m█▓▒░         Compiled Libft         ░▒▓█ \e[0m\n"
 	@printf "\e[38;5;46m█▓▒░   Minishell build successful   ░▒▓█ \e[0m\n"
