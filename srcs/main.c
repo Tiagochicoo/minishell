@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:04:20 by tiago             #+#    #+#             */
-/*   Updated: 2022/09/28 21:49:58 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/03 16:50:00 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,11 @@ int	main(int argc, char **argv, char **envp)
 {
 	int	i;
 
-	while (argc)
+	(void)argc;
+	(void)argv;
+	signal(SIGINT, handler);
+	while (1)
 	{
-		data.argv2 = argv;
 		data.env = *envp;
 		data.pwd = getcwd(NULL, 0);
 		data.rel_pwd = ft_strrchr(data.pwd, '/');

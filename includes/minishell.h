@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/09/27 15:47:32 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/03 16:50:14 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <string.h>
+#include <signal.h>
 
 # define RED "\x1B[31m"
 # define GREEN "\x1B[32m"
@@ -28,7 +29,6 @@
 
 typedef struct s_data
 {
-	char	**argv2;
 	char	*pwd;
 	char	*rel_pwd;
 	char	*buffer;
@@ -48,6 +48,7 @@ typedef struct s_command
 	char	*file_name;
 }	t_command;
 
+void	handler(int signum);
 
 
 
