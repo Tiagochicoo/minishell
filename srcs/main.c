@@ -20,6 +20,7 @@ int	main(int argc, char **argv, char **envp)
 
 	(void)argc;
 	(void)argv;
+	setting_signal();
 	signal(SIGINT, handler);
 	while (1)
 	{
@@ -27,7 +28,7 @@ int	main(int argc, char **argv, char **envp)
 		data.pwd = getcwd(NULL, 0);
 		data.rel_pwd = ft_strrchr(data.pwd, '/');
 		data.rel_pwd++;
-		
+
 		data.buffer = readline(GREEN "minishell" RESET " " YELLOW "~" RESET " ");
 		if (ft_strlen(data.buffer) > 0)
 			add_history(data.buffer);

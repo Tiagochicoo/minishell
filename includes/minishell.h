@@ -49,7 +49,7 @@ typedef struct s_command
 }	t_command;
 
 void	handler(int signum);
-
+void	setting_signal();
 
 
 #endif
