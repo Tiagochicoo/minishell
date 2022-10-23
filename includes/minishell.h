@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/10/03 16:50:14 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/23 17:12:15 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,23 @@
 # define BLUE "\x1B[34m"
 # define PURPLE "\x1B[35m"
 # define RESET "\x1b[0m"
+
+# define MAXLINE 1024
+// maxargs used in struct, can't be variable so we have to use define
+# define MAXARGS 128
+
+struct command {
+	int argc;					// number of args
+	char *argv[MAXARGS];		// arguments list
+	enum builtin_t 				// is argv[0] a builtin command?
+	{
+		NONE,
+		EXIT,
+		JOBS,
+		BG,
+		FG
+	} builtin;
+};
 
 typedef struct s_data
 {
