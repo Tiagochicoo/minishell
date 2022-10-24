@@ -6,14 +6,14 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/24 16:28:14 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/24 17:31:18 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 t_builtin parseBuiltin(t_command *cmd) {
-	if (!strcmp(cmd->argv[0], "echo"))		// echo command
+	if (!strcmp(cmd->argv[0], "echo"))			// echo command
 		return ECHO;
 	else if (!strcmp(cmd->argv[0], "cd")) 		// cd command
 		return CD;
@@ -66,7 +66,7 @@ int parse(const char *input, t_command *cmd) {
 	if (cmd->argc == 0)										// ignore blank line
 		return 1;
 	cmd->builtin = parseBuiltin(cmd);
-	if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0) 	// should job run in background?
+	if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?
 		cmd->argv[--cmd->argc] = NULL;
 	return is_bg;
 }
@@ -74,11 +74,12 @@ int parse(const char *input, t_command *cmd) {
 void run_sys_cmd(t_command *cmd, int bg)
 {
 	pid_t childPid;
-	
+
 	if ((childPid = fork()) < 0)					// fork a child process	
 		error("fork() error");
 	else if (childPid == 0)							// I'm the child and could run a command
 	{
+		printf("%s\n", cmd->argv[0]);
 		if (execvp(cmd->argv[0], cmd->argv) < 0)	// EXECVE != EXECVP
 		{
 			printf("minishell: command not found: %s%s%s\n", RED, cmd->argv[0], RESET);
@@ -96,32 +97,29 @@ void run_sys_cmd(t_command *cmd, int bg)
 
 void run_builtin_cmd(t_command *cmd) 
 {
-	switch (cmd->builtin) {
-		case ECHO:
-			run_sys_cmd(cmd, 0); break;
-		case CD:
-			chdir(cmd->argv[1]); break;
-		case PWD:
-			printf("%s\n", getcwd(cmd->argv[1], MAXLINE)); break;
-		case EXPORT:
-			printf("TODO: foreground\n"); break;
-		case UNSET:
-			printf("TODO: foreground\n"); break;
-		case ENV:
-			printf("TODO: foreground\n"); break;
-		case EXIT:
-			exit(0);
-		default:
-			error("Unknown builtin command");
-	}
+	if (cmd->builtin == ECHO)
+		echo(cmd);
+	else if (cmd->builtin == CD)
+		cd(cmd);
+	else if (cmd->builtin == PWD)
+		pwd();
+	else if (cmd->builtin == EXPORT)
+		export(cmd);
+	else if (cmd->builtin == ENV)
+		env(cmd->envp);
+	else if (cmd->builtin == UNSET)
+		unset(cmd);
+	else if (cmd->builtin == EXIT)
+		exit(0);
 }
 
-void eval(char *input) 
+void eval(char *input, char **envp) 
 {
-	int			background;				// should job run in background?
+	int			background;					// should job run in background?
 	t_command	cmd;						// parsed command
 
 	background = parse(input, &cmd);	 	// parse line into command struct
+	cmd.envp = envp;						// set envp
 	if (background == -1)					// parse error
 		return;
 	if (cmd.argv[0] == NULL)				// empty line - ignore
@@ -132,7 +130,7 @@ void eval(char *input)
 		run_builtin_cmd(&cmd);
 }
 
-int main(int argc, char **argv) 
+int main(int argc, char **argv, char **envp) 
 {
 	char *input; 							// buffer for readline
 
@@ -144,7 +142,7 @@ int main(int argc, char **argv)
 			input = readline(GREEN "minishell" RESET " " YELLOW "~" RESET " ");
 			if (ft_strcmp(input, "\n") > 0)
 				add_history(input);
-			eval(input);					// Evaluate input
+			eval(input, envp);					// Evaluate input
 		}
 	}
 }
