@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/24 16:39:13 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/24 17:42:39 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/24 18:02:28 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,13 @@ void	echo(t_command *cmd)
 		i++;
 	while (cmd->argv[i]) 
 	{
-		printf("[%d]\n", i);
 		printf("%s ", cmd->argv[i]);
 		i++;
 	}
-	if (ft_strcmp(cmd->argv[1], "-n") != 0)
+	if (cmd->argv[1] == NULL || ft_strcmp(cmd->argv[1], "-n") != 0)
 		printf("\n");
+	if (cmd->argv[1] != NULL && ft_strcmp(cmd->argv[1], "-n") == 0)
+		printf("\b");
 }
 
 void	cd(t_command *cmd) 

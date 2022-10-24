@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/24 17:31:18 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/24 22:23:35 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,10 +79,9 @@ void run_sys_cmd(t_command *cmd, int bg)
 		error("fork() error");
 	else if (childPid == 0)							// I'm the child and could run a command
 	{
-		printf("%s\n", cmd->argv[0]);
 		if (execvp(cmd->argv[0], cmd->argv) < 0)	// EXECVE != EXECVP
 		{
-			printf("minishell: command not found: %s%s%s\n", RED, cmd->argv[0], RESET);
+			printf("%sCommand not found: %s%s\n", RED, RESET, cmd->argv[0]);
 			exit(0);
 		}
 	}
@@ -132,14 +131,17 @@ void eval(char *input, char **envp)
 
 int main(int argc, char **argv, char **envp) 
 {
-	char *input; 							// buffer for readline
+	char	*input;							// buffer for readline
+	char	*cwd;
 
 	signal(SIGINT, handler);
 	if (argv[0] != NULL)
 	{
 		while (argc)
 		{
-			input = readline(GREEN "minishell" RESET " " YELLOW "~" RESET " ");
+			cwd = ft_relative_path(getcwd(NULL, 0));
+			printf("%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
+			input = readline(YELLOW "~" RESET " ");
 			if (ft_strcmp(input, "\n") > 0)
 				add_history(input);
 			eval(input, envp);					// Evaluate input

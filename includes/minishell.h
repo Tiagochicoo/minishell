@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/10/24 16:59:49 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/24 22:21:46 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,18 @@ typedef struct s_command
 	t_builtin	builtin;			// is argv[0] a builtin command?
 }			t_command;
 
+// SIGNALS
 void	handler(int signum);
+
+// BUILTINS
 void	env(char **envp);
 void	unset(t_command *cmd);
 void	export(t_command *cmd);
 void	pwd(void);
 void	cd(t_command *cmd);
 void	echo(t_command *cmd);
+
+// UTILS.C
+char	*ft_relative_path(char *cwd);
 
 #endif
