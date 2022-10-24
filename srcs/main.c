@@ -6,21 +6,27 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/23 18:39:57 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/24 16:28:14 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-enum builtin_t parseBuiltin(struct command *cmd) {
+t_builtin parseBuiltin(t_command *cmd) {
+	if (!strcmp(cmd->argv[0], "echo"))		// echo command
+		return ECHO;
+	else if (!strcmp(cmd->argv[0], "cd")) 		// cd command
+		return CD;
+	else if (!strcmp(cmd->argv[0], "pwd"))		// pwd command
+		return PWD;
+	else if (!strcmp(cmd->argv[0], "export"))	// export command
+		return EXPORT;
+	else if (!strcmp(cmd->argv[0], "env"))		// env command
+		return ENV;
+	else if (!strcmp(cmd->argv[0], "unset"))	// unset command
+		return UNSET;
 	if (!strcmp(cmd->argv[0], "exit"))			// exit command
 		return EXIT;
-	else if (!strcmp(cmd->argv[0], "jobs")) 	// jobs command
-		return JOBS;
-	else if (!strcmp(cmd->argv[0], "bg"))		// bg command
-		return BG;
-	else if (!strcmp(cmd->argv[0], "fg"))		// fg command
-		return FG;
 	else
 		return NONE;
 }
@@ -30,7 +36,7 @@ void error(char *msg) {
 	exit(0);
 }
 
-int parse(const char *input, struct command *cmd) {
+int parse(const char *input, t_command *cmd) {
 	static char	array[MAXLINE];					// local copy of command line
 	const char	delims[10] = " \t\r\n";			// argument delimiters
 	char		*line;							// ptr that traverses command line
@@ -56,17 +62,16 @@ int parse(const char *input, struct command *cmd) {
 			break;
 		line = token + 1;
 	}
-	cmd->argv[cmd->argc] = NULL; 							// argument list must end with a NULL pointer
+	cmd->argv[cmd->argc] = NULL;							// argument list must end with a NULL pointer
 	if (cmd->argc == 0)										// ignore blank line
 		return 1;
 	cmd->builtin = parseBuiltin(cmd);
 	if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0) 	// should job run in background?
 		cmd->argv[--cmd->argc] = NULL;
-
 	return is_bg;
 }
 
-void run_sys_cmd(struct command *cmd, int bg)
+void run_sys_cmd(t_command *cmd, int bg)
 {
 	pid_t childPid;
 	
@@ -74,7 +79,7 @@ void run_sys_cmd(struct command *cmd, int bg)
 		error("fork() error");
 	else if (childPid == 0)							// I'm the child and could run a command
 	{
-		if (execvp(cmd->argv[0], cmd->argv) < 0)	// EXECVE !!!!
+		if (execvp(cmd->argv[0], cmd->argv) < 0)	// EXECVE != EXECVP
 		{
 			printf("minishell: command not found: %s%s%s\n", RED, cmd->argv[0], RESET);
 			exit(0);
@@ -89,17 +94,23 @@ void run_sys_cmd(struct command *cmd, int bg)
 	}
 }
 
-void run_builtin_cmd(struct command *cmd) 
+void run_builtin_cmd(t_command *cmd) 
 {
 	switch (cmd->builtin) {
+		case ECHO:
+			run_sys_cmd(cmd, 0); break;
+		case CD:
+			chdir(cmd->argv[1]); break;
+		case PWD:
+			printf("%s\n", getcwd(cmd->argv[1], MAXLINE)); break;
+		case EXPORT:
+			printf("TODO: foreground\n"); break;
+		case UNSET:
+			printf("TODO: foreground\n"); break;
+		case ENV:
+			printf("TODO: foreground\n"); break;
 		case EXIT:
 			exit(0);
-		case JOBS:
-			printf("TODO: jobs\n"); break;
-		case BG:
-			printf("TODO: background\n"); break;
-		case FG:
-			printf("TODO: foreground\n"); break;
 		default:
 			error("Unknown builtin command");
 	}
@@ -107,8 +118,8 @@ void run_builtin_cmd(struct command *cmd)
 
 void eval(char *input) 
 {
-	int				background;				// should job run in background?
-	struct command	cmd;					// parsed command
+	int			background;				// should job run in background?
+	t_command	cmd;						// parsed command
 
 	background = parse(input, &cmd);	 	// parse line into command struct
 	if (background == -1)					// parse error
@@ -117,7 +128,7 @@ void eval(char *input)
 		return;
 	if (cmd.builtin == NONE)
 		run_sys_cmd(&cmd, background);
-	else 
+	else
 		run_builtin_cmd(&cmd);
 }
 
@@ -125,6 +136,7 @@ int main(int argc, char **argv)
 {
 	char *input; 							// buffer for readline
 
+	signal(SIGINT, handler);
 	if (argv[0] != NULL)
 	{
 		while (argc)

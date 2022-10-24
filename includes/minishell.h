@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/10/23 17:12:15 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/24 10:41:32 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,42 +31,25 @@
 // maxargs used in struct, can't be variable so we have to use define
 # define MAXARGS 128
 
-struct command {
-	int argc;					// number of args
-	char *argv[MAXARGS];		// arguments list
-	enum builtin_t 				// is argv[0] a builtin command?
-	{
-		NONE,
-		EXIT,
-		JOBS,
-		BG,
-		FG
-	} builtin;
-};
-
-typedef struct s_data
+typedef enum s_builtin
 {
-	char	*pwd;
-	char	*rel_pwd;
-	char	*buffer;
-	char	**cmds;
-	int		cmd_count;
-	char	*env;
-	
-}	t_data;
+	NONE,
+	ECHO,
+	CD,
+	PWD,
+	EXPORT,
+	UNSET,
+	ENV,
+	EXIT,
+}			t_builtin;
 
-typedef struct s_command
+typedef struct s_command 
 {
-	char	*str;
-	char	**env;
-	char	**argv;
-	int		fd_in;
-	int		fd_out;
-	char	*file_name;
-}	t_command;
+	int			argc;					// number of args
+	char		*argv[MAXARGS];		// arguments list
+	t_builtin	builtin;			// is argv[0] a builtin command?
+}			t_command;
 
 void	handler(int signum);
-
-
 
 #endif
