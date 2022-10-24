@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/10/24 22:21:46 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/24 22:31:27 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef enum s_builtin
 	UNSET,
 	ENV,
 	EXIT,
+	FT,
 }			t_builtin;
 
 typedef struct s_command 
@@ -64,5 +65,7 @@ void	echo(t_command *cmd);
 
 // UTILS.C
 char	*ft_relative_path(char *cwd);
+
+void	ft_ft(void);
 
 #endif

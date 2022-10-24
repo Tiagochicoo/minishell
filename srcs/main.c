@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/24 22:23:35 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/24 22:31:58 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ t_builtin parseBuiltin(t_command *cmd) {
 		return UNSET;
 	if (!strcmp(cmd->argv[0], "exit"))			// exit command
 		return EXIT;
+	if (!strcmp(cmd->argv[0], "42"))			// 42 command
+		return FT;
 	else
 		return NONE;
 }
@@ -110,6 +112,8 @@ void run_builtin_cmd(t_command *cmd)
 		unset(cmd);
 	else if (cmd->builtin == EXIT)
 		exit(0);
+	else if (cmd->builtin == FT)
+		ft_ft();
 }
 
 void eval(char *input, char **envp) 
@@ -144,7 +148,7 @@ int main(int argc, char **argv, char **envp)
 			input = readline(YELLOW "~" RESET " ");
 			if (ft_strcmp(input, "\n") > 0)
 				add_history(input);
-			eval(input, envp);					// Evaluate input
+			eval(input, envp);				// Evaluate input
 		}
 	}
 }
