@@ -25,14 +25,14 @@ void handler(int signal)
 	int		status;
 	char	*cwd;
 
-	cwd = ft_relative_path(getcwd(NULL, 0));
 	pid = waitpid(-1, &status, 0);
 	if (signal == SIGINT)
 	{
 		if (pid == -1)
 		{
-			printf("\n%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
-			rl_replace_line("", 0);
+			cwd = ft_relative_path(getcwd(NULL, 0));
+			printf("%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
+			rl_replace_line("\n", 0);
 			rl_on_new_line();
 			rl_redisplay();
 		}

@@ -19,6 +19,8 @@
 #include <readline/history.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 
 # define RED "\x1B[31m"
 # define GREEN "\x1B[32m"
@@ -54,6 +56,7 @@ typedef struct s_command
 
 // SIGNALS
 void	handler(int signum);
+void	setting_signal();
 
 // BUILTINS
 void	env(char **envp);

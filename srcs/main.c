@@ -12,7 +12,8 @@
 
 #include "../includes/minishell.h"
 
-t_builtin parseBuiltin(t_command *cmd) {
+t_builtin parseBuiltin(t_command *cmd) 
+{
 	if (!strcmp(cmd->argv[0], "echo"))			// echo command
 		return ECHO;
 	else if (!strcmp(cmd->argv[0], "cd")) 		// cd command
@@ -33,12 +34,14 @@ t_builtin parseBuiltin(t_command *cmd) {
 		return NONE;
 }
 
-void error(char *msg) {
+void error(char *msg) 
+{
 	printf("Error: %s", msg);
 	exit(0);
 }
 
-int parse(const char *input, t_command *cmd) {
+int parse(const char *input, t_command *cmd) 
+{
 	static char	array[MAXLINE];					// local copy of command line
 	const char	delims[10] = " \t\r\n";			// argument delimiters
 	char		*line;							// ptr that traverses command line
@@ -81,11 +84,13 @@ void run_sys_cmd(t_command *cmd, int bg)
 		error("fork() error");
 	else if (childPid == 0)							// I'm the child and could run a command
 	{
-		if (execvp(cmd->argv[0], cmd->argv) < 0)	// EXECVE != EXECVP
+		printf("----%s\n", ft_strjoin("/bin/", cmd->argv[0]));
+		if (execve(ft_strjoin("/bin/", cmd->argv[0]), cmd->argv, cmd->envp) < 0)	// EXECVE != EXECVP
 		{
 			printf("%sCommand not found: %s%s\n", RED, RESET, cmd->argv[0]);
 			exit(0);
 		}
+		printf("executed\n");
 	}
 	else	// I'm the parent. Shell continues here.
 	{
@@ -133,7 +138,7 @@ void eval(char *input, char **envp)
 		run_builtin_cmd(&cmd);
 }
 
-int main(int argc, char **argv, char **envp) 
+int	main(int argc, char **argv, char **envp) 
 {
 	char	*input;							// buffer for readline
 	char	*cwd;
@@ -146,7 +151,12 @@ int main(int argc, char **argv, char **envp)
 			cwd = ft_relative_path(getcwd(NULL, 0));
 			printf("%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
 			input = readline(YELLOW "~" RESET " ");
-			if (ft_strcmp(input, "\n") > 0)
+			if (!input)
+			{
+				printf("\n");
+				break;
+			}
+			else if (ft_strcmp(input, "\n") > 0)
 				add_history(input);
 			eval(input, envp);				// Evaluate input
 		}
