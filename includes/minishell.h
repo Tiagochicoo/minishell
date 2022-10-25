@@ -68,6 +68,7 @@ void	echo(t_command *cmd);
 
 // UTILS.C
 char	*ft_relative_path(char *cwd);
+char	*ft_find_cmd(t_command *cmd);
 
 void	ft_ft(void);
 
