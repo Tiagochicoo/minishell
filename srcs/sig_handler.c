@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/03 16:49:40 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/24 20:03:56 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/25 16:03:34 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,15 @@ void handler(int signal)
 {
 	pid_t	pid;
 	int		status;
+	char	*cwd;
 
+	cwd = ft_relative_path(getcwd(NULL, 0));
 	pid = waitpid(-1, &status, 0);
 	if (signal == SIGINT)
 	{
 		if (pid == -1)
 		{
-			printf("\n");
+			printf("\n%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
 			rl_replace_line("", 0);
 			rl_on_new_line();
 			rl_redisplay();
