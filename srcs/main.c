@@ -76,16 +76,44 @@ int parse(const char *input, t_command *cmd)
 	return is_bg;
 }
 
+char	*ft_find_cmd(t_command *cmd)					// needs to free return value!!!!
+{
+	char	*path;
+	char	*cmd_path;
+	char	*temp_path;
+	char	**all_paths;
+	int		i;
+
+	i = 0;
+	path = getenv("PATH");
+	all_paths = ft_split(path, ':');
+	while (all_paths[i])
+	{
+		temp_path = ft_strjoin(all_paths[i], "/");
+		cmd_path = ft_strjoin(temp_path, cmd->argv[0]);
+		if (!access(cmd_path, X_OK))
+		{
+			free(temp_path);
+			break ;
+		}
+		free(cmd_path);
+		free(temp_path);
+		i++;
+	}
+	return (cmd_path);
+}
+
 void run_sys_cmd(t_command *cmd, int bg)
 {
 	pid_t childPid;
+	char	*path;
 
 	if ((childPid = fork()) < 0)					// fork a child process	
 		error("fork() error");
 	else if (childPid == 0)							// I'm the child and could run a command
 	{
-		printf("----%s\n", ft_strjoin("/bin/", cmd->argv[0]));
-		if (execve(ft_strjoin("/bin/", cmd->argv[0]), cmd->argv, cmd->envp) < 0)	// EXECVE != EXECVP
+		path = ft_find_cmd(cmd);
+		if (execve(path, cmd->argv, cmd->envp) < 0)	// EXECVE != EXECVP
 		{
 			printf("%sCommand not found: %s%s\n", RED, RESET, cmd->argv[0]);
 			exit(0);
