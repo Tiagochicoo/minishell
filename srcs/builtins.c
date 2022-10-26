@@ -12,78 +12,96 @@
 
 #include "../includes/minishell.h"
 
-void	echo(t_command *cmd) 
+void	echo(t_command *cmd)
 {
-	int i = 1;
+	int	i;
+
+	i = 0;
 	while (cmd->argv[i] != NULL && ft_strcmp(cmd->argv[i], "-n") == 0)
 		i++;
-	while (cmd->argv[i]) 
-	{
-		printf("%s ", cmd->argv[i]);
-		i++;
-	}
+	while (cmd->argv[i])
+		printf("%s ", cmd->argv[i++]);
 	if (cmd->argv[1] == NULL || ft_strcmp(cmd->argv[1], "-n") != 0)
 		printf("\n");
 	if (cmd->argv[1] != NULL && ft_strcmp(cmd->argv[1], "-n") == 0)
 		printf("\b");
 }
 
-void	cd(t_command *cmd) 
+void	cd(t_command *cmd)
 {
-	if (cmd->argc == 1) {
+	if (cmd->argc == 1)
 		chdir(getenv("HOME"));
-	} else if (cmd->argc == 2) {
-		if (chdir(cmd->argv[1]) == -1) {
+	else if (cmd->argc == 2)
+	{
+		if (chdir(cmd->argv[1]) == -1)
 			printf("cd: %s: No such file or directory\n", cmd->argv[1]);
-		}
-	} else {
-		printf("cd: too many arguments\n");
 	}
+	else
+		printf("cd: too many arguments\n");
 }
 
-void	pwd(void) 
+void	pwd(void)
 {
-	char cwd[1024];
-	getcwd(cwd, sizeof(cwd));
+	char	*cwd;
+
+	cwd = NULL;
+	cwd = getcwd(cwd, 0);
+	if (cwd == NULL)
+		perror("pwd command error!");
 	printf("%s \n", cwd);
+	free(cwd);
 }
 
-void	export(t_command *cmd) 
+void	export(t_command *cmd)
 {
-	int i = 1;
-	while (cmd->argv[i]) {
-		if (ft_strchr(cmd->argv[i], '=')) {
-			char *key = ft_substr(cmd->argv[i], 0, ft_strchr(cmd->argv[i], '=') - cmd->argv[i]);
-			char *value = ft_substr(cmd->argv[i], ft_strchr(cmd->argv[i], '=') - cmd->argv[i] + 1, ft_strlen(cmd->argv[i]));
+	int		i;
+	char	*key;
+	char	*value;
+	char	*argv;
+
+	i = 1;
+	while (cmd->argv[i])
+	{
+		argv = cmd->argv[i];
+		if (ft_strchr(argv, '='))
+		{
+			key = ft_substr(argv, 0, ft_strchr(argv, '=') - argv);
+			value = ft_substr(argv, ft_strchr(argv, '=') - argv
+					+ 1, ft_strlen(argv));
 			setenv(key, value, 1);
 			free(key);
 			free(value);
-		} else {
-			printf("export: `%s': not a valid identifier\n", cmd->argv[i]);
 		}
+		else
+			printf("export: `%s': not a valid identifier\n", argv);
 		i++;
 	}
 }
 
-void	unset(t_command *cmd) 
+void	unset(t_command *cmd)
 {
-	int i = 1;
-	while (cmd->argv[i]) {
-		unsetenv(cmd->argv[i]);
-		i++;
-	}
+	int	i;
+
+	i = 1;
+	while (cmd->argv[i])
+		unsetenv(cmd->argv[i++]);
 }
 
-void	env(char **envp) 
+void	env(char **envp)
 {
-	int i = 0;
-	while (envp[i]) {
-		printf("%s \n", envp[i]);
-		i++;
-	}
+	int	i;
+
+	i = 0;
+	while (envp[i])
+		printf("%s \n", envp[i++]);
 }
 
-void	ft_ft(void) // prints ASCII art of 42 Lisboa
+/*
+	
+	prints ASCII art of 42 Lisboa
+
+*/
+void	ft_ft(void)
 {
 	printf("%s __ __      ____       %s__                    __%s\n", YELLOW, GREEN, RESET);
 	printf("%s/\\ \\\\ \\    /'___`\\%s    /\\ \\       __         /\\ \\                         %s\n", YELLOW, GREEN, RESET);

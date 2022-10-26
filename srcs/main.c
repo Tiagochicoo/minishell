@@ -55,7 +55,7 @@ int parse(const char *input, t_command *cmd)
 	(void) ft_strncpy(line, input, MAXLINE);
 	endline = line + ft_strlen(line);
 	cmd->argc = 0;								// build argv list
-	while (line < endline) 
+	while (line < endline)
 	{
 		line += strspn(line, delims);			// skip delimiters
 		if (line >= endline)
@@ -67,11 +67,12 @@ int parse(const char *input, t_command *cmd)
 			break;
 		line = token + 1;
 	}
-	cmd->argv[cmd->argc] = NULL;							// argument list must end with a NULL pointer
-	if (cmd->argc == 0)										// ignore blank line
+	cmd->argv[cmd->argc] = NULL;				// argument list must end with a NULL pointer
+	if (cmd->argc == 0)							// ignore blank line
 		return 1;
 	cmd->builtin = parseBuiltin(cmd);
-	if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?
+	is_bg = (*cmd->argv[cmd->argc-1] == '&');
+	if (is_bg)									// should job run in background?
 		cmd->argv[--cmd->argc] = NULL;
 	return is_bg;
 }
@@ -89,7 +90,6 @@ void run_sys_cmd(t_command *cmd, int bg)
 		if (execve(path, cmd->argv, cmd->envp) < 0)	// EXECVE != EXECVP
 		{
 			printf("%sError: command not found: %s%s\n", RED, RESET, cmd->argv[0]);
-			free(path);
 			exit(0);
 		}
 		free(path);
