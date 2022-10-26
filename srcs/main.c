@@ -88,7 +88,7 @@ void run_sys_cmd(t_command *cmd, int bg)
 		path = ft_find_cmd(cmd);
 		if (execve(path, cmd->argv, cmd->envp) < 0)	// EXECVE != EXECVP
 		{
-			printf("%sCommand not found: %s%s\n", RED, RESET, cmd->argv[0]);
+			printf("%sError: command not found: %s%s\n", RED, RESET, cmd->argv[0]);
 			exit(0);
 		}
 		printf("executed\n");
