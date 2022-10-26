@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/24 16:39:13 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/25 08:00:26 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/26 21:32:10 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	echo(t_command *cmd)
 {
 	int	i;
 
-	i = 0;
+	i = 1;
 	while (cmd->argv[i] != NULL && ft_strcmp(cmd->argv[i], "-n") == 0)
 		i++;
 	while (cmd->argv[i])
