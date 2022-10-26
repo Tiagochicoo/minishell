@@ -63,7 +63,7 @@ int parse(const char *input, t_command *cmd)
 		token = line + strcspn(line, delims);	// Find token delimiter
 		*token = '\0';							// terminate the token
 		cmd->argv[cmd->argc++] = line;			// Record token as the token argument
-		if (cmd->argc >= MAXARGS-1) 			// Check if argv is full
+		if (cmd->argc >= MAXARGS-1)				// Check if argv is full
 			break;
 		line = token + 1;
 	}
@@ -89,13 +89,14 @@ void run_sys_cmd(t_command *cmd, int bg)
 		if (execve(path, cmd->argv, cmd->envp) < 0)	// EXECVE != EXECVP
 		{
 			printf("%sError: command not found: %s%s\n", RED, RESET, cmd->argv[0]);
+			free(path);
 			exit(0);
 		}
-		printf("executed\n");
+		free(path);
 	}
 	else	// I'm the parent. Shell continues here.
 	{
-		 if (bg) 
+		 if (bg)
 			printf("Child in background [%d]\n",childPid);
 		 else
 			wait(&childPid);
