@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/26 21:18:14 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/26 21:27:58 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,10 @@ int parse(const char *input, t_command *cmd)
 	cmd->argc = 0;								// build argv list
 	while (line < endline)
 	{
-		line += ft_strspn(line, delims);		// skip delimiters
+		line += ft_strspn(line, delims);			// skip delimiters
 		if (line >= endline)
 			break;
-		token = line + ft_strspn(line, delims);	// Find token delimiter
+		token = line + ft_strcspn(line, delims);// Find token delimiter
 		*token = '\0';							// terminate the token
 		cmd->argv[cmd->argc++] = line;			// Record token as the token argument
 		if (cmd->argc >= MAXARGS-1)				// Check if argv is full
