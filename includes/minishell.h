@@ -54,13 +54,13 @@ typedef struct s_command
 	t_builtin	builtin;			// is argv[0] a builtin command?
 }			t_command;
 
-typedef struct s_token
-{
-	char		*token;
-	int			type;
-	t_token		*next;
-	t_token		*prev;
-}			t_token;
+// typedef struct s_token
+// {
+// 	char		*token;
+// 	int			type;
+// 	t_token		*next;
+// 	t_token		*prev;
+// }			t_token;
 
 // SIGNALS
 void	handler(int signum);
@@ -77,6 +77,9 @@ void	echo(t_command *cmd);
 // UTILS.C
 char	*ft_relative_path(char *cwd);
 char	*ft_find_cmd(t_command *cmd);
+
+// EXECUTOR
+void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg);
 
 void	ft_ft(void);
 

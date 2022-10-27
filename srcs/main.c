@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/26 21:38:03 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/26 21:30:54 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,16 +77,39 @@ int parse(const char *input, t_command *cmd)
 	return is_bg;
 }
 
-void run_sys_cmd(t_command *cmd, int bg)
+void	file_exists(t_command *cmd, int bg)
+{
+	char	*tmp;
+
+	tmp = ft_find_cmd(cmd);
+	if (tmp != NULL)
+		run_sys_cmd(cmd, tmp, bg);
+	else if (!access(cmd->argv[0], F_OK))
+	{
+		printf("File Exists\n");
+		if (!access(cmd->argv[0], X_OK))
+		{
+			printf("Has access\n");
+			run_sys_cmd(cmd, cmd->argv[0], bg);
+		}
+		else
+			perror("Error");
+	}
+	else
+		perror("Error: command not found!");
+}
+
+void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 {
 	pid_t childPid;
 	char	*path;
 
+	path = cmd_argv0;
+	printf("%s\n", path);
 	if ((childPid = fork()) < 0)					// fork a child process	
 		error("fork() error");
 	else if (childPid == 0)							// I'm the child and could run a command
 	{
-		path = ft_find_cmd(cmd);
 		if (execve(path, cmd->argv, cmd->envp) < 0)	// EXECVE != EXECVP
 		{
 			printf("%sError: command not found: %s%s\n", RED, RESET, cmd->argv[0]);
@@ -135,7 +158,7 @@ void eval(char *input, char **envp)
 	if (cmd.argv[0] == NULL)				// empty line - ignore
 		return;
 	if (cmd.builtin == NONE)
-		run_sys_cmd(&cmd, background);
+		file_exists(&cmd, background);
 	else
 		run_builtin_cmd(&cmd);
 }

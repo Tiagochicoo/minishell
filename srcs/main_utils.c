@@ -34,6 +34,7 @@ char	*ft_find_cmd(t_command *cmd)					// needs to free return value!!!!
 		}
 		free(cmd_path);
 		free(temp_path);
+		cmd_path = NULL;
 		i++;
 	}
 	return (cmd_path);
