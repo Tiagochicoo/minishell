@@ -12,6 +12,24 @@
 
 #include "libft.h"
 
+/*
+		by mimarques
+*/
+
+char	**ft_delete_split_arr(char **arr)
+{
+	int	i;
+
+	i = 0;
+	while (arr[i])
+	{
+		free(arr[i]);
+		i++;
+	}
+	free(arr);
+	return (NULL);
+}
+
 static long long	word_count(char *str, char charset)
 {
 	long long	count;

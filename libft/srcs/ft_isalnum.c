@@ -18,3 +18,20 @@ int	ft_isalnum(int c)
 		return (1);
 	return (0);
 }
+
+int	ft_str_isalnum(char *str)
+{
+	int	i;
+	int	c;
+
+	i = 0;
+	while (*str)
+	{
+		c = ft_atoi(str);
+		if (ft_isalpha(c) || ft_isdigit(c))
+			str++;
+		else
+			return (0);
+	}
+	return (1);
+}
