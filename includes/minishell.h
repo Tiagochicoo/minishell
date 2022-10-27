@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/10/24 22:31:27 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/26 21:48:19 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,14 @@ typedef struct s_command
 	char		**envp;				// environment variables
 	t_builtin	builtin;			// is argv[0] a builtin command?
 }			t_command;
+
+typedef struct s_token
+{
+	char		*token;
+	int			type;
+	t_token		*next;
+	t_token		*prev;
+}			t_token;
 
 // SIGNALS
 void	handler(int signum);
