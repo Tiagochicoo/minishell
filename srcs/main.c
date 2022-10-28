@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/26 21:30:54 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/27 18:39:39 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,8 +95,6 @@ void	file_exists(t_command *cmd, int bg)
 		else
 			perror("Error");
 	}
-	else
-		perror("Error: command not found!");
 }
 
 void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
