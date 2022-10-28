@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/27 18:39:39 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/28 18:56:36 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,6 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 	char	*path;
 
 	path = cmd_argv0;
-	printf("%s\n", path);
 	if ((childPid = fork()) < 0)					// fork a child process	
 		error("fork() error");
 	else if (childPid == 0)							// I'm the child and could run a command
