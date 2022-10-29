@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/29 01:28:37 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/10/29 14:32:42 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,6 +182,22 @@ char	*ft_strpbrk(const char *s, char *accept)
 	return (NULL);
 }
 
+//Gets the previous node from the current one
+t_list	*ft_lstbefore(t_list *lst, t_list *current)
+{
+	t_list	*previous;
+
+	previous = NULL;
+	if (!lst || !current)
+		return (NULL);
+	while (lst->next != current)
+	{
+		previous = lst;
+		lst = lst->next;
+	}
+	return (previous);
+}
+
 int	getnextc(char const *s, char c)
 {
 	int	i;
@@ -201,7 +217,8 @@ typedef enum e_tok_type
 {
 	TEXT,
 	SINGLE_Q,
-	DOUBLE_Q
+	DOUBLE_Q,
+	COMMAND
 }		t_tok_type;
 
 typedef struct s_token
@@ -209,6 +226,19 @@ typedef struct s_token
 	int		tok_type;
 	char	*token;
 }		t_token;
+
+void	get_text(t_list **lst, char *input, char *tmp)
+{
+	t_token	*tok;
+
+	if (count_up_to_chr(input, tmp) == 0)
+		return ;
+	//make a linked list node with text up to quote
+	tok = malloc(sizeof(t_token));
+	tok->tok_type = TEXT;
+	tok->token = ft_substr(input, 0, count_up_to_chr(input, tmp)); //get text up to tmp
+	ft_lstadd_back(lst, ft_lstnew(tok));
+}
 
 void	get_quote(t_list **lst, char *input, char *tmp, char quote)
 {
@@ -222,11 +252,10 @@ void	get_quote(t_list **lst, char *input, char *tmp, char quote)
 	if (tmpb == NULL)
 		perror("Error: unclosed quote");
 	//make a linked list node with text up to quote
-	tok = malloc(sizeof(t_token));
-	tok->tok_type = TEXT;
-	tok->token = ft_substr(input, 0, count_up_to_chr(input, tmp)); //get text up to quote
-	ft_lstadd_back(lst, ft_lstnew(tok));
+	get_text(lst, input, tmp);
 	//add a linked list node with quote after text
+	if (count_up_to_chr(tmp, tmpb) == 0)
+		return ;
 	tok = malloc(sizeof(t_token));
 	if (quote == '\"')
 		tok->tok_type = DOUBLE_Q;
@@ -237,42 +266,100 @@ void	get_quote(t_list **lst, char *input, char *tmp, char quote)
 	return (lst);
 }
 
-void	get_text(t_list **lst, char *input, char *tmp)
-{
-	t_token	*tok;
-
-	//make a linked list node with text up to quote
-	tok = malloc(sizeof(t_token));
-	tok->tok_type = TEXT;
-	tok->token = ft_substr(input, 0, count_up_to_chr(input, tmp)); //get text up to tmp
-	ft_lstadd_back(lst, ft_lstnew(tok));
-}
-
-void	parser(char *input)
+void	quote_parser(t_list **lst, char *input)
 {
 	char	*inpt;
 	char	*tmp;
 	char	*tmpb;
-	t_list	*lst;
 
+	inpt = input;
 	while (inpt != '\0')
 	{
 		tmp = ft_strpbrk(inpt,"\"'"); //try to find quotes
 		if (tmp == '\'') //has single quote
-			get_quote(&lst, inpt, tmp, '\'');
+			get_quote(lst, inpt, tmp, '\'');
 		else if (tmp == '"') //has double quote
-			get_quote(&lst, inpt, tmp, '"');
+			get_quote(lst, inpt, tmp, '"');
 		else if (tmp == NULL) //get last piece of text
 		{
 			tmp = inpt;
 			while (tmp != '\0')
 				tmp++;
-			get_text(&lst, inpt, tmp);
+			get_text(lst, inpt, tmp);
 			break ;
 		}
 		inpt = tmpb;
 	}
 }
+
+// /!\ EDGE CASE ; at the end without anything after untested
+t_list	*column_splitter(t_list *inpt)
+{
+	t_list	*list;
+	t_token	*tok;
+	char	**split;
+	int		j;
+
+	list = NULL;
+	split = ft_split(((t_token *)inpt->content)->token, ';');
+	while (split[j])
+	{
+		tok = malloc(sizeof(t_token));
+		tok->token = ft_strdup(split[j]);
+		tok->tok_type = COMMAND;
+		ft_lstadd_back(&list, ft_lstnew(tok));
+		j++;
+	}
+	if (split != NULL)
+		ft_delete_split_arr(split);
+	return (list);
+}
+
+void	del_tok(void *a)
+{
+	t_token	*content;
+
+	content = (t_token *)a;
+	free(content->token);
+	free(content);
+	content = NULL
+}
+
+void	column_parser(t_list **lst)
+{
+	t_list	*i;
+	t_list	*tmp;
+	t_list	*prev;
+	t_list	*next;
+
+	i = *lst;
+	while (i)
+	{
+		if (((t_token *)i->content)->tok_type == TEXT)
+		{
+			tmp = column_splitter(i);
+			prev = ft_lstbefore(*lst, i);
+			//edge case if there
+			//if there is no previous and we split current node
+			if (prev = NULL && tmp != NULL)
+			{
+				next = (*lst)->next; //save next if there's any
+				ft_lstdelone(*lst, del_tok); //delete current node since it is going to be replaced
+				*lst = tmp; //replace node
+				ft_lstlast(*lst)->next = next; //add trailing nodes
+			}
+			else if (tmp != NULL)
+			{
+				next = i->next; //save next if there's any
+				ft_lstdelone(i, del_tok); //delete current node since it is going to be replaced
+				prev = tmp; //replace node
+				ft_lstlast(*lst)->next = next; //add trailing nodes
+			}
+		}
+		i = i->next;
+	}
+}
+
 
 int	main(int argc, char **argv, char **envp) 
 {
