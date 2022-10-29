@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+         #
+#    By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/22 16:50:02 by tpereira          #+#    #+#              #
-#    Updated: 2022/10/03 22:34:10 by tpereira         ###   ########.fr        #
+#    Updated: 2022/10/28 22:18:57 by mimarque         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 MINISHELL   = minishell
 CC          = gcc
-CFLAGS      = -Wall -Wextra -Werror -g -lreadline -L /opt/homebrew/Cellar/readline/8.1.2/lib/ -I /opt/homebrew/Cellar/readline/8.1.2/include
+CFLAGS      = -Wall -Wextra -Werror -g -lreadline -L /opt/homebrew/Cellar/readline/8.2.1/lib/ -I /opt/homebrew/Cellar/readline/8.2.1/include
 SRCS        = ./srcs/*.c
 LIB         = libft/libft.a
 

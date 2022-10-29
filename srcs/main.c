@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/28 18:56:36 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/29 01:28:37 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,6 +158,120 @@ void eval(char *input, char **envp)
 		file_exists(&cmd, background);
 	else
 		run_builtin_cmd(&cmd);
+}
+
+/**
+ * @brief LibC function to find a character from a list of chars
+ * 
+ * @param s string to go through
+ * @param accept list of chars to find in 's'
+ * @return char* 
+ */
+char	*ft_strpbrk(const char *s, char *accept)
+{
+	char	*a;
+
+	while (*s != '\0')
+	{
+		a = accept;
+		while (*a != '\0')
+			if (*a++ == *s)
+				return ((char *) s);
+		++s;
+	}
+	return (NULL);
+}
+
+int	getnextc(char const *s, char c)
+{
+	int	i;
+
+	i = 0;
+	while (s[i] != '\0' && s[i] != c)
+		i++;
+	return (i);
+}
+
+int	count_up_to_chr(char *string, char *pos)
+{
+	return (pos - string);
+}
+
+typedef enum e_tok_type
+{
+	TEXT,
+	SINGLE_Q,
+	DOUBLE_Q
+}		t_tok_type;
+
+typedef struct s_token
+{
+	int		tok_type;
+	char	*token;
+}		t_token;
+
+void	get_quote(t_list **lst, char *input, char *tmp, char quote)
+{
+	char	*tmpb;
+	t_token	*tok;
+
+	if (quote == '\"')
+		tmpb = ft_strpbrk((tmp+1),"\"");
+	else
+		tmpb = ft_strpbrk((tmp+1),"'");
+	if (tmpb == NULL)
+		perror("Error: unclosed quote");
+	//make a linked list node with text up to quote
+	tok = malloc(sizeof(t_token));
+	tok->tok_type = TEXT;
+	tok->token = ft_substr(input, 0, count_up_to_chr(input, tmp)); //get text up to quote
+	ft_lstadd_back(lst, ft_lstnew(tok));
+	//add a linked list node with quote after text
+	tok = malloc(sizeof(t_token));
+	if (quote == '\"')
+		tok->tok_type = DOUBLE_Q;
+	else
+		tok->tok_type = SINGLE_Q;
+	tok->token = ft_substr(tmp + 1, 0, count_up_to_chr(tmp, tmpb)); //get text between quotes
+	ft_lstadd_back(lst, ft_lstnew(tok));
+	return (lst);
+}
+
+void	get_text(t_list **lst, char *input, char *tmp)
+{
+	t_token	*tok;
+
+	//make a linked list node with text up to quote
+	tok = malloc(sizeof(t_token));
+	tok->tok_type = TEXT;
+	tok->token = ft_substr(input, 0, count_up_to_chr(input, tmp)); //get text up to tmp
+	ft_lstadd_back(lst, ft_lstnew(tok));
+}
+
+void	parser(char *input)
+{
+	char	*inpt;
+	char	*tmp;
+	char	*tmpb;
+	t_list	*lst;
+
+	while (inpt != '\0')
+	{
+		tmp = ft_strpbrk(inpt,"\"'"); //try to find quotes
+		if (tmp == '\'') //has single quote
+			get_quote(&lst, inpt, tmp, '\'');
+		else if (tmp == '"') //has double quote
+			get_quote(&lst, inpt, tmp, '"');
+		else if (tmp == NULL) //get last piece of text
+		{
+			tmp = inpt;
+			while (tmp != '\0')
+				tmp++;
+			get_text(&lst, inpt, tmp);
+			break ;
+		}
+		inpt = tmpb;
+	}
 }
 
 int	main(int argc, char **argv, char **envp) 
