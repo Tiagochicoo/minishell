@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/31 17:57:26 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/31 18:09:11 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,6 @@ void	parser(char *input, t_command *cmd)
 	if (lst == NULL)
 		return ;
 	column_parser(&lst);
-	printf("%s\n", cmd->argv[0]);
 }
 
 void	file_exists(t_command *cmd, int bg)

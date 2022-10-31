@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/31 18:03:09 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/31 18:08:12 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ t_list	*ft_lstbefore(t_list *lst, t_list *current)
 	previous = NULL;
 	if (lst == NULL || current == NULL)
 		return (NULL);
-	while (lst->next != current)
+	while (lst != current)
 	{
 		previous = lst;
 		lst = lst->next;
