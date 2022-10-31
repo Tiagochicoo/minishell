@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/10/26 21:48:19 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/31 17:44:41 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,13 +54,19 @@ typedef struct s_command
 	t_builtin	builtin;			// is argv[0] a builtin command?
 }			t_command;
 
-// typedef struct s_token
-// {
-// 	char		*token;
-// 	int			type;
-// 	t_token		*next;
-// 	t_token		*prev;
-// }			t_token;
+typedef enum e_tok_type
+{
+	TEXT,
+	SINGLE_Q,
+	DOUBLE_Q,
+	COMMAND
+}		t_tok_type;
+
+typedef struct s_token
+{
+	int		tok_type;
+	char	*token;
+}		t_token;
 
 // SIGNALS
 void	handler(int signum);
@@ -82,5 +88,19 @@ char	*ft_find_cmd(t_command *cmd);
 void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg);
 
 void	ft_ft(void);
+
+// PARSER
+char *ft_strpbrk(const char *s, const char *accept);
+t_list *ft_lstbefore(t_list *lst, t_list *current);
+int getnextc(char const *s, char c);
+int count_up_to_chr(char *string, char *pos);
+void get_text(t_list **lst, char **input, char *tmp);
+void get_quotes(t_list **lst, char **input, char *tmp);
+void quote_parser(t_list **lst, char *input);
+t_list *column_splitter(t_list *inpt);
+void del_tok(void *a);
+void ft_lst_iter(t_list *lst);
+void column_parser(t_list **lst);
+
 
 #endif
