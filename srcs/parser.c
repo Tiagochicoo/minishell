@@ -79,7 +79,7 @@ void	get_text(t_list **lst, char **input, char *tmp)
 		return ;
 	//make a linked list node with text up to quote
 	tok = malloc(sizeof(t_token));
-	tok->tok_type = TEXT;
+ 	tok->tok_type = TEXT;
 	tok->token = ft_substr(*input, 0, count_up_to_chr(*input, tmp)); //get text up to tmp
 	ft_lstadd_back(lst, ft_lstnew(tok));
 }
@@ -135,7 +135,6 @@ void	quote_parser(t_list **lst, char *input)
 			break ;
 		}
 	}
-	ft_lst_iter(*lst);
 }
 
 // /!\ EDGE CASE ; at the end without anything after untested
@@ -149,7 +148,7 @@ t_list	*column_splitter(t_list *inpt)
 	j = 0;
 	list = NULL;
 	split = ft_split(((t_token *)inpt->content)->token, ';');
-	while (split[j])
+	while (split && split[j])
 	{
 		tok = malloc(sizeof(t_token));
 		tok->token = ft_strdup(split[j]);
@@ -174,11 +173,16 @@ void	del_tok(void *a)
 
 void	ft_lst_iter(t_list *lst)
 {
+	static int	iter = 0;
+
+	printf("\n\n");
 	while (lst)
 	{
 		printf("token: %s\n", ((t_token *)lst->content)->token);
 		lst = lst->next;
 	}
+	iter++;
+	printf("iter: %d\n", iter);
 }
 
 void	column_parser(t_list **lst)
@@ -193,15 +197,11 @@ void	column_parser(t_list **lst)
 	{
 		if (((t_token *)i->content)->tok_type == TEXT)
 		{
-			printf("token: %d\n", ((t_token *)i->content)->tok_type);
+			printf("---token: %d\n", ((t_token *)i->content)->tok_type);
 			tmp = column_splitter(i);
-			printf("print_tmp\n");
-			ft_lst_iter(tmp);
-			printf("\nprint_tmp_end\n");
 			prev = ft_lstbefore(*lst, i);
 			//edge case if there
 			//if there is no previous and we split current node
-			printf("column_parser\n");
 			if (prev == NULL && tmp != NULL)
 			{
 				next = (*lst)->next; //save next if there's any

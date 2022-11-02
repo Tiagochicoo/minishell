@@ -24,9 +24,11 @@ char	**ft_delete_split_arr(char **arr)
 	while (arr[i])
 	{
 		free(arr[i]);
+		arr[i] = NULL;
 		i++;
 	}
 	free(arr);
+	arr = NULL;
 	return (NULL);
 }
 
@@ -62,6 +64,8 @@ char	**ft_split(char const *str, char charset)
 	long long	i;
 	char		*from;
 
+	if (!ft_strchr(str, (unsigned int)charset))
+		return (NULL);
 	str_arr = (char **)malloc(sizeof(char *)
 			* word_count((char *)str, charset) + 1);
 	if (!str || !(str_arr))
