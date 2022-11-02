@@ -52,6 +52,9 @@ typedef struct s_command
 	char		*argv[MAXARGS];		// arguments list
 	char		**envp;				// environment variables
 	t_builtin	builtin;			// is argv[0] a builtin command?
+	void		*output;
+	s_command		*next;
+	s_command		*prev;
 }			t_command;
 
 typedef enum e_tok_type

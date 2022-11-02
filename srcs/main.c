@@ -14,6 +14,8 @@
 
 t_builtin parseBuiltin(t_command *cmd) 
 {
+	int i;
+	
 	if (!strcmp(cmd->argv[0], "echo"))			// echo command
 		return ECHO;
 	else if (!strcmp(cmd->argv[0], "cd")) 		// cd command
@@ -40,6 +42,42 @@ void error(char *msg)
 	exit(0);
 }
 
+int parse(const char *input, t_command *cmd) 
+{
+	static char	array[MAXLINE];					// local copy of command line
+	const char	delims[10] = " \t\r\n";			// argument delimiters
+	char		*line;							// ptr that traverses command line
+	char		*token;							// ptr to the end of the current arg
+	char		*endline;						// ptr to the end of the input string
+	int			is_bg;							// background job?
+
+	line = array;
+	if (input == NULL)
+		error("command line is NULL\n");
+	(void) ft_strncpy(line, input, MAXLINE);
+	endline = line + ft_strlen(line);
+	cmd->argc = 0;								// build argv list
+	while (line < endline) 
+	{
+		line += ft_strspn(line, delims);		// skip delimiters
+		if (line >= endline)
+			break;
+		token = line + ft_strspn(line, delims);	// Find token delimiter
+		*token = '\0';							// terminate the token
+		cmd->argv[cmd->argc++] = line;			// Record token as the token argument
+		if (cmd->argc >= MAXARGS-1) 			// Check if argv is full
+			break;
+		line = token + 1;
+	}
+	cmd->argv[cmd->argc] = NULL;							// argument list must end with a NULL pointer
+	if (cmd->argc == 0)										// ignore blank line
+		return 1;
+	cmd->builtin = parseBuiltin(cmd);
+	if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?
+		cmd->argv[--cmd->argc] = NULL;
+	return is_bg;
+}
+
 void	parser(char *input, t_command *cmd)
 {
 	t_list *lst;
@@ -54,6 +92,15 @@ void	parser(char *input, t_command *cmd)
 	if (lst == NULL)
 		return ;
 	column_parser(&lst);
+	cmd->argc = ft_lstsize(lst);
+	cmd->lst_argv = lst;
+	cmd->argv[cmd->argc] = NULL;							// argument list must end with a NULL pointer
+	if (cmd->argc == 0)										// ignore blank line
+		return ;
+	cmd->builtin = parseBuiltin(cmd);
+	// if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?
+	// 	cmd->argv[--cmd->argc] = NULL;
+	// return (is_bg);
 }
 
 void	file_exists(t_command *cmd, int bg)
@@ -125,13 +172,13 @@ void eval(char *input, char **envp)
 	int			background;					// should job run in background?
 	t_command	cmd;						// parsed command
 
-	background = 0;							// parse the input command
-	parser(input, &cmd);					// parse line into command struct
+	background = 0;					// parse the input command into command struct
+	parser(input, &cmd);		
 	cmd.envp = envp;						// set envp
 	if (background == -1)					// parse error
-		return;
+		return ;
 	if (cmd.argv[0] == NULL)				// empty line - ignore
-		return;
+		return ;
 	if (cmd.builtin == NONE)
 		file_exists(&cmd, background);
 	else
