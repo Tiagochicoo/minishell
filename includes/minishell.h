@@ -46,6 +46,8 @@ typedef enum s_builtin
 	FT,
 }			t_builtin;
 
+// 
+
 typedef struct s_command 
 {
 	int			argc;				// number of args
@@ -53,6 +55,7 @@ typedef struct s_command
 	char		**envp;				// environment variables
 	t_builtin	builtin;			// is argv[0] a builtin command?
 	void		*output;
+	// operator type enum
 	s_command		*next;
 	s_command		*prev;
 }			t_command;
