@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/06 00:24:05 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/06 19:29:29 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <stdbool.h>
 
 # define RED "\x1B[31m"
 # define GREEN "\x1B[32m"
@@ -54,7 +55,6 @@ typedef struct s_command
 	char		*argv[MAXARGS];		// arguments list
 	t_token		*args;				// linked list 
 	char		**envp;				// environment variables
-	t_builtin	builtin;			// is argv[0] a builtin command?
 	void		*input;				
 	void		*output;
 	// operator type enum
@@ -110,5 +110,16 @@ void del_tok(void *a);
 void ft_lst_iter(t_list *lst);
 void column_parser(t_list **lst);
 
+//linked list
+void	dll_add_back(t_command **lst, t_command *new);
+void	dll_add_front(t_command **lst, t_command *new);
+void	dll_add_after(t_command *current, t_command *new);
+void	dll_content_del(t_command *current);
+void	dll_delone(t_command **lst, t_command *current);
+void	dll_clear(t_command **lst);
+t_command	*dll_last(t_command *lst);
+t_command	*dll_penultimate(t_command *lst);
+int	dll_size(t_command *lst);
+void	dll_iter(t_command *lst, int property, void (*f)(void *));
 
 #endif

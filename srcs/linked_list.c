@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/05 12:32:04 by mimarque          #+#    #+#             */
-/*   Updated: 2022/11/06 00:23:39 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/06 17:21:10 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,3 +133,11 @@ void	dll_iter(t_command *lst, int property, void (*f)(void *))
 }
 
 //falta dll_new mas acho melhor fazer contigo por causa dos argumentos
+t_command	*dll_new(t_list *lst)
+{
+	t_command *new;
+
+	new = malloc(sizeof(t_command));
+	new->args = lst;
+	return (new);
+}

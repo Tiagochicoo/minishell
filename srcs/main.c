@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/31 18:09:11 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/06 21:00:42 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,16 +88,7 @@ void	parser(char *input, t_command *cmd)
 	if (input == NULL)
 		error("command line is NULL\n");
 	quote_parser(&lst, input);
-	ft_lst_iter(lst);
-	if (lst == NULL)
-		return ;
-	column_parser(&lst);
-	cmd->argc = ft_lstsize(lst);
-	cmd->lst_argv = lst;
-	cmd->argv[cmd->argc] = NULL;							// argument list must end with a NULL pointer
-	if (cmd->argc == 0)										// ignore blank line
-		return ;
-	cmd->builtin = parseBuiltin(cmd);
+
 	// if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?
 	// 	cmd->argv[--cmd->argc] = NULL;
 	// return (is_bg);
@@ -147,6 +138,7 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 	}
 }
 
+//change this to be the first argv
 void run_builtin_cmd(t_command *cmd) 
 {
 	if (cmd->builtin == ECHO)
