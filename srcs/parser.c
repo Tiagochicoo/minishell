@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/31 18:08:12 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/05 19:46:21 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,6 +136,12 @@ void	quote_parser(t_list **lst, char *input)
 		}
 	}
 }
+
+//command arg1 "arg2" arg3 < input > output; command2 arg1 arg2 arg3 
+//command arg1 -> "arg2" -> arg3 < input > output; command2 arg1 arg2 arg3 
+//t_command(command arg1 -> "arg2" -> arg3 < input > output )=>t_command(command2 arg1 arg2 arg3)
+//t_command(command arg1 -> "arg2" -> arg3 )=>t_command(< input)=> t_command(> output )=>t_command(command2 arg1 arg2 arg3)
+//t_command(< input)=>t_command(command arg1 -> "arg2" -> arg3 )=> t_command(> output )=>t_command(command2 arg1 arg2 arg3)
 
 // /!\ EDGE CASE ; at the end without anything after untested
 t_list	*column_splitter(t_list *inpt)

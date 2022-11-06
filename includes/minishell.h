@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/10/31 17:44:41 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/06 00:24:05 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,12 +52,14 @@ typedef struct s_command
 {
 	int			argc;				// number of args
 	char		*argv[MAXARGS];		// arguments list
+	t_token		*args;				// linked list 
 	char		**envp;				// environment variables
 	t_builtin	builtin;			// is argv[0] a builtin command?
+	void		*input;				
 	void		*output;
 	// operator type enum
-	s_command		*next;
-	s_command		*prev;
+	struct s_command		*next;
+	struct s_command		*prev;
 }			t_command;
 
 typedef enum e_tok_type
