@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/06 21:00:42 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/08 13:23:34 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,16 +78,18 @@ int parse(const char *input, t_command *cmd)
 	return is_bg;
 }
 
-void	parser(char *input, t_command *cmd)
+void	parser(char *input)
 {
-	t_list *lst;
+	t_list		*lst;
+	t_command	*list;
 
 	lst = NULL;
-	if (!cmd)
-		printf("no cmd\n");
 	if (input == NULL)
 		error("command line is NULL\n");
 	quote_parser(&lst, input);
+	list = column_parser(&lst);
+
+
 
 	// if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?
 	// 	cmd->argv[--cmd->argc] = NULL;

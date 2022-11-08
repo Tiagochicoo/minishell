@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/06 19:29:29 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/08 13:08:25 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,17 @@ typedef enum e_tok_type
 	COMMAND
 }		t_tok_type;
 
+typedef enum e_operators
+{
+	INPT,
+	OTPT,
+	HFIL,
+	APND,
+	PIPE,
+	OR,
+	AND
+}		t_operators;
+
 typedef struct s_token
 {
 	int		tok_type;
@@ -108,7 +119,7 @@ void quote_parser(t_list **lst, char *input);
 t_list *column_splitter(t_list *inpt);
 void del_tok(void *a);
 void ft_lst_iter(t_list *lst);
-void column_parser(t_list **lst);
+t_command *column_parser(t_list **lst);
 
 //linked list
 void	dll_add_back(t_command **lst, t_command *new);

@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/05 12:32:04 by mimarque          #+#    #+#             */
-/*   Updated: 2022/11/06 17:21:10 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/07 10:40:59 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,33 @@ void	dll_add_after(t_command *current, t_command *new)
 	new->prev = current;
 	if (new->next != NULL)
 		new->next->prev = new;
+}
+
+//'move' goes before 'current'
+void	dll_put_before(t_command **lst, t_command *current, t_command *move)
+{
+	t_command *prevn;
+	t_command *nextn;
+
+	if (!lst || !current || !move || (current == move))
+		return ;
+	prevn = move->prev;
+	nextn = move->next;
+	//cut move
+	if (*lst == move) //if move is first elem in the list
+		*lst = move->next;
+	if (prevn) //if move is not in the beginning
+		prevn->next = nextn;
+	if (nextn) //if move is not in the end
+		nextn->prev = prevn;
+	//insert move before current
+	if (*lst == current) //if current is first elem in the list
+		*lst = move; //make head point to move
+	move->prev = current->prev; //make move point to the same current is pointing
+	if (current->prev) //if current is not the first elem in the list
+		current->prev->next = move; //make the elem before current point to move
+	current->prev = move; //make current point to move
+	move->next = current; //make move point to current
 }
 
 void	dll_content_del(t_command *current)
@@ -140,4 +167,15 @@ t_command	*dll_new(t_list *lst)
 	new = malloc(sizeof(t_command));
 	new->args = lst;
 	return (new);
+}
+
+void	dll_gethead(t_command **lst)
+{
+	if (!lst)
+		return ;
+	if ((*lst)->prev = NULL)
+		return ;
+	else
+		while (*lst != NULL)
+			*lst = (*lst)->prev;
 }

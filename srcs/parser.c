@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/06 21:12:51 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/08 13:23:34 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,30 +143,6 @@ void	quote_parser(t_list **lst, char *input)
 //t_command(command arg1 -> "arg2" -> arg3 )=>t_command(< input)=> t_command(> output )=>t_command(command2 arg1 arg2 arg3)
 //t_command(< input)=>t_command(command arg1 -> "arg2" -> arg3 )=> t_command(> output )=>t_command(command2 arg1 arg2 arg3)
 
-// /!\ EDGE CASE ; at the end (without anything after) untested
-t_list	*column_splitter(t_list *inpt)
-{
-	t_list	*list;
-	t_token	*tok;
-	char	**split;
-	int		j;
-
-	j = 0;
-	list = NULL;
-	split = ft_split(((t_token *)inpt->content)->token, ';');
-	while (split && split[j])
-	{
-		tok = malloc(sizeof(t_token));
-		tok->token = ft_strdup(split[j]);
-		tok->tok_type = COMMAND;
-		ft_lstadd_back(&list, ft_lstnew(tok));
-		j++;
-	}
-	if (split != NULL)
-		ft_delete_split_arr(split);
-	return (list);
-}
-
 void	del_tok(void *a)
 {
 	t_token	*content;
@@ -189,43 +165,6 @@ void	ft_lst_iter(t_list *lst)
 	}
 	iter++;
 	printf("iter: %d\n", iter);
-}
-
-void	column_parser(t_list **lst)
-{
-	t_list	*i;
-	t_list	*tmp;
-	t_list	*prev;
-	t_list	*next;
-
-	i = *lst;
-	while (i)
-	{
-		if (((t_token *)i->content)->tok_type == TEXT)
-		{
-			printf("---token: %d\n", ((t_token *)i->content)->tok_type);
-			tmp = column_splitter(i);
-			prev = ft_lstbefore(*lst, i);
-			//edge case if there
-			//if there is no previous and we split current node
-			if (prev == NULL && tmp != NULL)
-			{
-				next = (*lst)->next; //save next if there's any
-				ft_lstdelone(*lst, del_tok); //delete current node since it is going to be replaced
-				*lst = tmp; //replace node
-				ft_lstlast(*lst)->next = next; //add trailing nodes
-			}
-			else if (tmp != NULL)
-			{
-				next = i->next; //save next if there's any
-				ft_lstdelone(i, del_tok); //delete current node since it is going to be replaced
-				prev = tmp; //replace node
-				ft_lstlast(*lst)->next = next; //add trailing nodes
-			}
-		}
-		i = i->next;
-	}
-	ft_lst_iter(i);
 }
 
 int	strarrsize(char **arr)
@@ -344,4 +283,74 @@ t_command	*column_parser(t_list **lst)
 	//add either the whole list if skipped while or the last part to a t_command
 	dll_add_back(dll, dll_new(*lst));
 	return (dll);
+}
+
+//GNU C STRSEP
+size_t	strcspn(char *str1, const char *str2)
+{
+	char	*p;
+	char	*spanp;
+	char	c;
+	char	sc;
+
+	/*
+	 * Stop as soon as we find any character from s2.  Note that there
+	 * must be a NUL in s2; it suffices to stop when we find that, too.
+	 */
+	p = str1;
+	while (true)
+	{
+		c = *p++;
+		spanp = str2;
+		do {
+			if ((sc = *spanp++) == c)
+				return (p - 1 - str1);
+		} while (sc != 0);
+	}
+}
+
+char	*ft_strsep(char **stringp, const char *delim)
+{
+	char	*begin;
+	char	*end;
+
+	begin = *stringp;
+	if (begin == NULL)
+		return NULL;
+	/* Find the end of the token.  */
+	end = begin + ft_strcspn(begin, delim);
+	if (*end)
+	{
+		/* Terminate the token and set *STRINGP past NUL character.  */
+		*end++ = '\0';
+		*stringp = end;
+	}
+	else
+		/* No more delimiters; this is the last token.  */
+		*stringp = NULL;
+	return (begin);
+}
+
+char	*find_operator(char *str)
+{
+	return (ft_strpbrk(str, "><|&"));
+}
+
+//what do if op+1 is NUL?
+int	what_operator(char *op)
+{
+	if (*op == '>' && *(op + 1) == '>')
+		return (APND);
+	else if (*op == '>')
+	 	return (OTPT);
+	if (*op == '<' && *(op + 1) == '<')
+		return (HFIL);
+	else if (*op == '<')
+	 	return (INPT);
+	if (*op == '|' && *(op + 1) == '|')
+		return (OR);
+	else if (*op == '|')
+	 	return (PIPE);
+	if (*op == '&' && *(op + 1) == '&')
+		return (AND);
 }
