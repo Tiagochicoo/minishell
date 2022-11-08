@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/08 19:28:46 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/08 19:34:13 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,7 +230,7 @@ void	col_split_parser(t_list **lst, t_list *current, char **split, t_command **d
 	if (size > 2)
 	{
 		i = 1;
-		while(split[i + 1] != '\0')
+		while(split[i + 1])
 		{
 			dll_add_back(dll_list, dll_new(ft_lstnew(new_token(split[i], TEXT))));
 			i++;
@@ -282,7 +282,7 @@ t_command	*column_parser(t_list **lst)
 		i = i->next;
 	}
 	//add either the whole list if skipped while or the last part to a t_command
-	dll_add_back(dll, dll_new(*lst));
+	dll_add_back(&dll, dll_new(*lst));
 	return (dll);
 }
 

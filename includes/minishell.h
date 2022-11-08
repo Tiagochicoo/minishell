@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/08 19:28:47 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/08 19:32:06 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ typedef struct s_command
 {
 	int			argc;				// number of args
 	char		*argv[MAXARGS];		// arguments list
-	t_token		*args;				// linked list 
+	t_list		*args;				// linked list 
 	char		**envp;				// environment variables
 	void		*input;				
 	void		*output;
@@ -130,7 +130,7 @@ t_command *dll_last(t_command *lst);
 t_command *dll_penultimate(t_command *lst);
 int dll_size(t_command *lst);
 void dll_iter(t_command *lst, int property, void (*f)(void *));
-t_command *dll_new(t_token *lst);
+t_command *dll_new(t_list *lst);
 void dll_gethead(t_command **lst);
 
 

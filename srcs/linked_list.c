@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/05 12:32:04 by mimarque          #+#    #+#             */
-/*   Updated: 2022/11/08 19:23:38 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/08 19:32:10 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,7 @@ void	dll_iter(t_command *lst, int property, void (*f)(void *))
 	}
 }
 
-t_command	*dll_new(t_token *lst)
+t_command	*dll_new(t_list *lst)
 {
 	t_command *new;
 
