@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/08 13:08:25 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/08 19:28:47 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,13 @@ typedef enum s_builtin
 
 // 
 
-typedef struct s_command 
+typedef struct s_token
+{
+	int		tok_type;
+	char	*token;
+}		t_token;
+
+typedef struct s_command
 {
 	int			argc;				// number of args
 	char		*argv[MAXARGS];		// arguments list
@@ -58,34 +64,26 @@ typedef struct s_command
 	void		*input;				
 	void		*output;
 	// operator type enum
+	t_builtin	cmd_type;			// builtin type enum
 	struct s_command		*next;
 	struct s_command		*prev;
 }			t_command;
 
 typedef enum e_tok_type
 {
+	ERROR,
 	TEXT,
 	SINGLE_Q,
 	DOUBLE_Q,
-	COMMAND
-}		t_tok_type;
-
-typedef enum e_operators
-{
-	INPT,
-	OTPT,
-	HFIL,
-	APND,
+	INPUT,
+	OUTPUT,
+	HFILE,
+	APPEND,
 	PIPE,
 	OR,
 	AND
-}		t_operators;
-
-typedef struct s_token
-{
-	int		tok_type;
-	char	*token;
-}		t_token;
+}
+t_tok_type;
 
 // SIGNALS
 void	handler(int signum);
@@ -116,12 +114,27 @@ int count_up_to_chr(char *string, char *pos);
 void get_text(t_list **lst, char **input, char *tmp);
 void get_quotes(t_list **lst, char **input, char *tmp);
 void quote_parser(t_list **lst, char *input);
-t_list *column_splitter(t_list *inpt);
+t_list *column_splitter(t_list *INPUT);
 void del_tok(void *a);
 void ft_lst_iter(t_list *lst);
 t_command *column_parser(t_list **lst);
 
-//linked list
+void dll_add_back(t_command **lst, t_command *new);
+void dll_add_front(t_command **lst, t_command *new);
+void dll_add_after(t_command *current, t_command *new);
+void dll_put_before(t_command **lst, t_command *current, t_command *move);
+void dll_content_del(t_command *current);
+void dll_delone(t_command **lst, t_command *current);
+void dll_clear(t_command **lst);
+t_command *dll_last(t_command *lst);
+t_command *dll_penultimate(t_command *lst);
+int dll_size(t_command *lst);
+void dll_iter(t_command *lst, int property, void (*f)(void *));
+t_command *dll_new(t_token *lst);
+void dll_gethead(t_command **lst);
+
+
+// linked list
 void	dll_add_back(t_command **lst, t_command *new);
 void	dll_add_front(t_command **lst, t_command *new);
 void	dll_add_after(t_command *current, t_command *new);

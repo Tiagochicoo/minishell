@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/08 13:23:34 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/08 19:25:01 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 t_builtin parseBuiltin(t_command *cmd) 
 {
-	int i;
+	//int i;
 	
 	if (!strcmp(cmd->argv[0], "echo"))			// echo command
 		return ECHO;
@@ -72,7 +72,7 @@ int parse(const char *input, t_command *cmd)
 	cmd->argv[cmd->argc] = NULL;							// argument list must end with a NULL pointer
 	if (cmd->argc == 0)										// ignore blank line
 		return 1;
-	cmd->builtin = parseBuiltin(cmd);
+	cmd->cmd_type = parseBuiltin(cmd);
 	if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?
 		cmd->argv[--cmd->argc] = NULL;
 	return is_bg;
@@ -81,13 +81,13 @@ int parse(const char *input, t_command *cmd)
 void	parser(char *input)
 {
 	t_list		*lst;
-	t_command	*list;
+	//t_command	*list;               remove comment 
 
 	lst = NULL;
 	if (input == NULL)
 		error("command line is NULL\n");
 	quote_parser(&lst, input);
-	list = column_parser(&lst);
+	//list = column_parser(&lst);
 
 
 
@@ -143,21 +143,21 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 //change this to be the first argv
 void run_builtin_cmd(t_command *cmd) 
 {
-	if (cmd->builtin == ECHO)
+	if (cmd->cmd_type == ECHO)
 		echo(cmd);
-	else if (cmd->builtin == CD)
+	else if (cmd->cmd_type == CD)
 		cd(cmd);
-	else if (cmd->builtin == PWD)
+	else if (cmd->cmd_type == PWD)
 		pwd();
-	else if (cmd->builtin == EXPORT)
+	else if (cmd->cmd_type == EXPORT)
 		export(cmd);
-	else if (cmd->builtin == ENV)
+	else if (cmd->cmd_type == ENV)
 		env(cmd->envp);
-	else if (cmd->builtin == UNSET)
+	else if (cmd->cmd_type == UNSET)
 		unset(cmd);
-	else if (cmd->builtin == EXIT)
+	else if (cmd->cmd_type == EXIT)
 		exit(0);
-	else if (cmd->builtin == FT)
+	else if (cmd->cmd_type == FT)
 		ft_ft();
 }
 
@@ -167,13 +167,13 @@ void eval(char *input, char **envp)
 	t_command	cmd;						// parsed command
 
 	background = 0;					// parse the input command into command struct
-	parser(input, &cmd);		
+	parser(input);		
 	cmd.envp = envp;						// set envp
 	if (background == -1)					// parse error
 		return ;
 	if (cmd.argv[0] == NULL)				// empty line - ignore
 		return ;
-	if (cmd.builtin == NONE)
+	if (cmd.cmd_type == NONE)
 		file_exists(&cmd, background);
 	else
 		run_builtin_cmd(&cmd);

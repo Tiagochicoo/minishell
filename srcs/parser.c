@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/08 13:23:34 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/08 19:28:46 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,25 +113,25 @@ t_list	**get_quote(t_list **lst, char **input, char *tmp, char quote)
 
 void	quote_parser(t_list **lst, char *input)
 {
-	char	*inpt;
+	char	*INPUT;
 	char	*tmp;
 
-	inpt = input;
-	while (inpt != (void *)0)
+	INPUT = input;
+	while (INPUT != (void *)0)
 	{
-		tmp = ft_strpbrk(inpt, "\"'");			//try to find quotes
+		tmp = ft_strpbrk(INPUT, "\"'");			//try to find quotes
 		if (tmp == NULL)
 			break;
 		if (ft_strchr(tmp, '\''))				//has single quote
-			get_quote(lst, &inpt, tmp, '\'');
+			get_quote(lst, &INPUT, tmp, '\'');
 		else if (ft_strchr(tmp, '"'))			//has double quote
-			get_quote(lst, &inpt, tmp, '"');
+			get_quote(lst, &INPUT, tmp, '"');
 		else if (tmp == NULL)					//get last piece of text
 		{
-			tmp = inpt;
+			tmp = INPUT;
 			while (tmp != (void *)0)
 				tmp++;
-			get_text(lst, &inpt, tmp);
+			get_text(lst, &INPUT, tmp);
 			break ;
 		}
 	}
@@ -171,6 +171,7 @@ int	strarrsize(char **arr)
 {
 	int		i;
 
+	i = 0;
 	while (arr)
 	{
 		arr++;
@@ -196,7 +197,7 @@ bool	is_lastchar(char *str, char cmp)
 
 	tmp = ft_strchr(str, (int)cmp);
 	size = ft_strsize(str);
-	if (tmp == str[size - 1]) // off by one?
+	if (*tmp == str[size - 1]) // off by one?
 		return (true);
 	return (false);
 }
@@ -285,30 +286,6 @@ t_command	*column_parser(t_list **lst)
 	return (dll);
 }
 
-//GNU C STRSEP
-size_t	strcspn(char *str1, const char *str2)
-{
-	char	*p;
-	char	*spanp;
-	char	c;
-	char	sc;
-
-	/*
-	 * Stop as soon as we find any character from s2.  Note that there
-	 * must be a NUL in s2; it suffices to stop when we find that, too.
-	 */
-	p = str1;
-	while (true)
-	{
-		c = *p++;
-		spanp = str2;
-		do {
-			if ((sc = *spanp++) == c)
-				return (p - 1 - str1);
-		} while (sc != 0);
-	}
-}
-
 char	*ft_strsep(char **stringp, const char *delim)
 {
 	char	*begin;
@@ -340,17 +317,18 @@ char	*find_operator(char *str)
 int	what_operator(char *op)
 {
 	if (*op == '>' && *(op + 1) == '>')
-		return (APND);
+		return (APPEND);
 	else if (*op == '>')
-	 	return (OTPT);
+	 	return (OUTPUT);
 	if (*op == '<' && *(op + 1) == '<')
-		return (HFIL);
+		return (HFILE);
 	else if (*op == '<')
-	 	return (INPT);
+	 	return (INPUT);
 	if (*op == '|' && *(op + 1) == '|')
 		return (OR);
 	else if (*op == '|')
 	 	return (PIPE);
 	if (*op == '&' && *(op + 1) == '&')
 		return (AND);
+	return (0);
 }

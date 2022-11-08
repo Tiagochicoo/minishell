@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   linked_list.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/05 12:32:04 by mimarque          #+#    #+#             */
-/*   Updated: 2022/11/07 10:40:59 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/08 19:23:38 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	dll_add_back(t_command **lst, t_command *new)
         *lst = new;
         return ;
     }
-	tmp = dll_last(lst);
+	tmp = dll_last(*lst);
 	tmp->next = new;
 	new->prev = tmp;
 }
@@ -92,7 +92,7 @@ void	dll_delone(t_command **lst, t_command *current)
 {
 	if (!lst || !current)
 		return ;
-	if (lst == current)
+	if (*lst == current)
 		*lst = current->next;
 	if (current->next != NULL)
         current->next->prev = current->prev;
@@ -105,9 +105,7 @@ void	dll_delone(t_command **lst, t_command *current)
 //Acho que funciona mas não tenho a certeza
 void	dll_clear(t_command **lst)
 {
-	t_command *tmp;
-
-	if (!lst)
+	if (!*lst)
 		return ;
 	while (*lst)
 		dll_delone(lst, *lst);
@@ -159,8 +157,7 @@ void	dll_iter(t_command *lst, int property, void (*f)(void *))
 	}
 }
 
-//falta dll_new mas acho melhor fazer contigo por causa dos argumentos
-t_command	*dll_new(t_list *lst)
+t_command	*dll_new(t_token *lst)
 {
 	t_command *new;
 
@@ -173,7 +170,7 @@ void	dll_gethead(t_command **lst)
 {
 	if (!lst)
 		return ;
-	if ((*lst)->prev = NULL)
+	if ((*lst)->prev == NULL)
 		return ;
 	else
 		while (*lst != NULL)
