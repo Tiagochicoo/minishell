@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/27 08:59:57 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/28 18:50:25 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/09 16:50:19 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,7 @@ char	**ft_split(char const *str, char charset)
 
 	if (!ft_strchr(str, (unsigned int)charset))
 		return (NULL);
-	str_arr = (char **)malloc(sizeof(char *)
-			* word_count((char *)str, charset) + 1);
+	str_arr = (char **)ft_calloc(word_count((char *)str, charset) + 1, sizeof(char *));
 	if (!str || !(str_arr))
 		return (NULL);
 	i = 0;

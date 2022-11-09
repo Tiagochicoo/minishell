@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/08 19:32:06 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/09 15:32:04 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,17 +107,28 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg);
 void	ft_ft(void);
 
 // PARSER
-char *ft_strpbrk(const char *s, const char *accept);
-t_list *ft_lstbefore(t_list *lst, t_list *current);
-int getnextc(char const *s, char c);
-int count_up_to_chr(char *string, char *pos);
-void get_text(t_list **lst, char **input, char *tmp);
-void get_quotes(t_list **lst, char **input, char *tmp);
-void quote_parser(t_list **lst, char *input);
-t_list *column_splitter(t_list *INPUT);
-void del_tok(void *a);
-void ft_lst_iter(t_list *lst);
-t_command *column_parser(t_list **lst);
+char		*ft_strpbrk(const char *s, const char *accept);
+t_list		*ft_lstbefore(t_list *lst, t_list *current);
+int			getnextc(char const *s, char c);
+int			count_up_to_chr(char *string, char *pos);
+void		get_text(t_list **lst, char **input, char *tmp);
+t_list		**get_quote(t_list **lst, char **input, char *tmp, char quote);
+void		quote_parser(t_list **lst, char *input);
+void		del_tok(void *a);
+void		ft_lst_iter(t_list *lst);
+int			strarrsize(char **arr);
+int 		ft_strsize(char *str);
+bool		is_lastchar(char *str, char cmp);
+t_token		*new_token(char *content, t_tok_type type);
+void		col_split_parser(t_list **lst, t_list *current, char **split, t_command **dll_list);
+void		col_end_parser(t_list **lst, t_list *current, t_command **dll_list);
+t_command	*column_parser(t_list **lst);
+char		*find_operator(char *str);
+int			what_operator(char *op);
+int			size_of_op(int op);
+void		split_on_op(t_list *lst, char *pos, int op_size, int op);
+void		operator_parser(t_command *list);
+void 		print_shit(t_command *list); //remove!
 
 void dll_add_back(t_command **lst, t_command *new);
 void dll_add_front(t_command **lst, t_command *new);

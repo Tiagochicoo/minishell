@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/08 19:25:01 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/09 15:32:26 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,16 +81,16 @@ int parse(const char *input, t_command *cmd)
 void	parser(char *input)
 {
 	t_list		*lst;
-	//t_command	*list;               remove comment 
+	t_command	*list;
 
 	lst = NULL;
 	if (input == NULL)
 		error("command line is NULL\n");
 	quote_parser(&lst, input);
-	//list = column_parser(&lst);
-
-
-
+	list = column_parser(&lst);
+	operator_parser(list);
+	print_shit(list);
+	
 	// if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?
 	// 	cmd->argv[--cmd->argc] = NULL;
 	// return (is_bg);

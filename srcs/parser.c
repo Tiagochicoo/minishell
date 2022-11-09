@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/08 19:34:13 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/09 16:37:19 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,25 +113,24 @@ t_list	**get_quote(t_list **lst, char **input, char *tmp, char quote)
 
 void	quote_parser(t_list **lst, char *input)
 {
-	char	*INPUT;
+	char	*inpt;
 	char	*tmp;
-
-	INPUT = input;
-	while (INPUT != (void *)0)
+	inpt = input;
+	while (inpt)
 	{
-		tmp = ft_strpbrk(INPUT, "\"'");			//try to find quotes
+		tmp = ft_strpbrk(inpt, "\"'");			//try to find quotes
 		if (tmp == NULL)
 			break;
 		if (ft_strchr(tmp, '\''))				//has single quote
-			get_quote(lst, &INPUT, tmp, '\'');
+			get_quote(lst, &inpt, tmp, '\'');
 		else if (ft_strchr(tmp, '"'))			//has double quote
-			get_quote(lst, &INPUT, tmp, '"');
+			get_quote(lst, &inpt, tmp, '"');
 		else if (tmp == NULL)					//get last piece of text
 		{
-			tmp = INPUT;
+			tmp = inpt;
 			while (tmp != (void *)0)
 				tmp++;
-			get_text(lst, &INPUT, tmp);
+			get_text(lst, &inpt, tmp);
 			break ;
 		}
 	}
@@ -195,8 +194,11 @@ bool	is_lastchar(char *str, char cmp)
 	char	*tmp;
 	int		size;
 
+
 	tmp = ft_strchr(str, (int)cmp);
 	size = ft_strsize(str);
+	if (!tmp)
+		return (false);
 	if (*tmp == str[size - 1]) // off by one?
 		return (true);
 	return (false);
@@ -286,49 +288,113 @@ t_command	*column_parser(t_list **lst)
 	return (dll);
 }
 
-char	*ft_strsep(char **stringp, const char *delim)
-{
-	char	*begin;
-	char	*end;
-
-	begin = *stringp;
-	if (begin == NULL)
-		return NULL;
-	/* Find the end of the token.  */
-	end = begin + ft_strcspn(begin, delim);
-	if (*end)
-	{
-		/* Terminate the token and set *STRINGP past NUL character.  */
-		*end++ = '\0';
-		*stringp = end;
-	}
-	else
-		/* No more delimiters; this is the last token.  */
-		*stringp = NULL;
-	return (begin);
-}
-
 char	*find_operator(char *str)
 {
 	return (ft_strpbrk(str, "><|&"));
 }
 
-//what do if op+1 is NUL?
 int	what_operator(char *op)
 {
+	if (!*(op + 1))
+		return(ERROR);
 	if (*op == '>' && *(op + 1) == '>')
 		return (APPEND);
 	else if (*op == '>')
 	 	return (OUTPUT);
-	if (*op == '<' && *(op + 1) == '<')
+	else if (*op == '<' && *(op + 1) == '<')
 		return (HFILE);
 	else if (*op == '<')
 	 	return (INPUT);
-	if (*op == '|' && *(op + 1) == '|')
+	else if (*op == '|' && *(op + 1) == '|')
 		return (OR);
 	else if (*op == '|')
 	 	return (PIPE);
-	if (*op == '&' && *(op + 1) == '&')
+	else if (*op == '&' && *(op + 1) == '&')
 		return (AND);
-	return (0);
+	return (ERROR);
+}
+
+int	size_of_op(int op)
+{
+	if (op == APPEND || op == HFILE || op == OR || op == AND)
+		return (2);
+	else if (op == PIPE || op == OUTPUT || op == INPUT)
+	 	return (1);
+	else
+		return (0);
+}
+
+void	split_on_op(t_list *lst, char *pos, int op_size, int op)
+{
+	char	*temp;
+	char	*prev;
+	char	*next;
+	t_list	*new;
+	int		size;
+	
+	temp = ((t_token *)lst->content)->token;
+	//split token
+	size = (pos - 1) - temp; //get size up to operator
+	prev = malloc(sizeof(char) * size); 
+	ft_strncpy(prev, temp, size);
+	size = ft_strsize(temp) - (size + op_size); //get size after the operator
+	next = malloc(sizeof(char) * size);
+	ft_strncpy(next, (pos - 1 + op_size), size); //copy after the operator
+	//replace content on current node
+	free(temp);
+	((t_token *)lst->content)->token = prev;
+	//add new node
+	new = ft_lstnew(new_token(next, op));
+	new->next = lst->next;
+	lst->next = new;
+}
+
+void	operator_parser(t_command *list)
+{
+	t_token	*content;
+	t_list	*node;
+	char	*op;
+	int		t_op;
+
+	while (list)
+	{
+		//t_command(dll_node)->t_list(ll_node)->t_token(content)
+		node = ((t_list *)list->args);
+		while (node)
+		{
+			content = ((t_token *)node->content);
+			op = find_operator(content->token);
+			if (op != NULL)
+			{
+				t_op = what_operator(op);
+				split_on_op(node, op, size_of_op(t_op), t_op);
+			}
+			node = node->next;
+		}
+		list = list->next;
+	}
+}
+
+void print_shit(t_command *list)
+{
+	t_token	*content;
+	t_list	*node;
+	int		n;
+
+	n = 1;
+	while (list)
+	{
+		printf("\n");
+		printf("%d => ", n);
+		node = ((t_list *)list->args);
+		while (node)
+		{
+			content = ((t_token *)node->content);
+			printf("%d: %s -> ", content->tok_type, content->token);
+			node = node->next;
+		}
+		printf("\n");
+		n++;
+		list = list->next;
+	}
 }

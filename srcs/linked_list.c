@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   linked_list.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/05 12:32:04 by mimarque          #+#    #+#             */
-/*   Updated: 2022/11/08 19:32:10 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/08 22:23:52 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,6 @@ t_command	*dll_penultimate(t_command *lst)
 		return (NULL);
 	return ((dll_last(lst)->prev));
 }
-
 
 int	dll_size(t_command *lst)
 {
