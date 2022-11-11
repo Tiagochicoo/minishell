@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jdias-mo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/09 15:32:26 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/10 19:38:52 by jdias-mo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-t_builtin parseBuiltin(t_command *cmd) 
+t_builtin parseBuiltin(t_command *cmd)
 {
 	//int i;
-	
+
 	if (!strcmp(cmd->argv[0], "echo"))			// echo command
 		return ECHO;
 	else if (!strcmp(cmd->argv[0], "cd")) 		// cd command
@@ -36,13 +36,13 @@ t_builtin parseBuiltin(t_command *cmd)
 		return NONE;
 }
 
-void error(char *msg) 
+void error(char *msg)
 {
 	printf("Error: %s", msg);
 	exit(0);
 }
 
-int parse(const char *input, t_command *cmd) 
+int parse(const char *input, t_command *cmd)
 {
 	static char	array[MAXLINE];					// local copy of command line
 	const char	delims[10] = " \t\r\n";			// argument delimiters
@@ -57,7 +57,7 @@ int parse(const char *input, t_command *cmd)
 	(void) ft_strncpy(line, input, MAXLINE);
 	endline = line + ft_strlen(line);
 	cmd->argc = 0;								// build argv list
-	while (line < endline) 
+	while (line < endline)
 	{
 		line += ft_strspn(line, delims);		// skip delimiters
 		if (line >= endline)
@@ -90,7 +90,7 @@ void	parser(char *input)
 	list = column_parser(&lst);
 	operator_parser(list);
 	print_shit(list);
-	
+
 	// if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?
 	// 	cmd->argv[--cmd->argc] = NULL;
 	// return (is_bg);
@@ -120,7 +120,7 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 	char	*path;
 
 	path = cmd_argv0;
-	if ((childPid = fork()) < 0)					// fork a child process	
+	if ((childPid = fork()) < 0)					// fork a child process
 		error("fork() error");
 	else if (childPid == 0)							// I'm the child and could run a command
 	{
@@ -141,7 +141,7 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 }
 
 //change this to be the first argv
-void run_builtin_cmd(t_command *cmd) 
+void run_builtin_cmd(t_command *cmd)
 {
 	if (cmd->cmd_type == ECHO)
 		echo(cmd);
@@ -161,25 +161,30 @@ void run_builtin_cmd(t_command *cmd)
 		ft_ft();
 }
 
-void eval(char *input, char **envp) 
+void eval(char *input, char **envp)
 {
-	int			background;					// should job run in background?
+	int			background;// should job run in background?
+	int			i;
 	t_command	cmd;						// parsed command
 
+	i = 0;
 	background = 0;					// parse the input command into command struct
-	parser(input);		
+	parser(input);
 	cmd.envp = envp;						// set envp
 	if (background == -1)					// parse error
 		return ;
-	if (cmd.argv[0] == NULL)				// empty line - ignore
-		return ;
-	if (cmd.cmd_type == NONE)
-		file_exists(&cmd, background);
-	else
-		run_builtin_cmd(&cmd);
+	while (cmd.argv[0] && i < dll_size(cmd))		// enquanto houver comandos para executar
+	{
+		if (cmd.cmd_type == NONE)
+			file_exists(&cmd, background);
+		else
+			run_builtin_cmd(&cmd);
+		i++;
+	}
+	return ;
 }
 
-int	main(int argc, char **argv, char **envp) 
+int	main(int argc, char **argv, char **envp)
 {
 	char	*input;							// buffer for readline
 	char	*cwd;

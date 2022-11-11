@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jdias-mo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/09 15:32:04 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/11 01:13:03 by jdias-mo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,12 @@ typedef enum s_builtin
 	FT,
 }			t_builtin;
 
-// 
+typedef struct	s_pipe		// pipe struct
+{
+	int	i;
+	int	*fd;
+	int	n;
+}				t_pipe
 
 typedef struct s_token
 {
@@ -59,10 +64,11 @@ typedef struct s_command
 {
 	int			argc;				// number of args
 	char		*argv[MAXARGS];		// arguments list
-	t_list		*args;				// linked list 
+	t_list		*args;				// linked list
 	char		**envp;				// environment variables
-	void		*input;				
+	void		*input;
 	void		*output;
+	t_pipe		pipe;				// pipe info
 	// operator type enum
 	t_builtin	cmd_type;			// builtin type enum
 	struct s_command		*next;
