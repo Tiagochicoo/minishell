@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/09 16:37:19 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/11 00:27:09 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@ t_list	*ft_lstbefore(t_list *lst, t_list *current)
 
 	previous = NULL;
 	if (lst == NULL || current == NULL)
+		return (NULL);
+	if (lst == current)
 		return (NULL);
 	while (lst != current)
 	{
@@ -115,32 +117,37 @@ void	quote_parser(t_list **lst, char *input)
 {
 	char	*inpt;
 	char	*tmp;
+	
 	inpt = input;
 	while (inpt)
 	{
 		tmp = ft_strpbrk(inpt, "\"'");			//try to find quotes
-		if (tmp == NULL)
-			break;
-		if (ft_strchr(tmp, '\''))				//has single quote
-			get_quote(lst, &inpt, tmp, '\'');
-		else if (ft_strchr(tmp, '"'))			//has double quote
-			get_quote(lst, &inpt, tmp, '"');
-		else if (tmp == NULL)					//get last piece of text
+		if (tmp == NULL)					//get last piece of text
 		{
 			tmp = inpt;
-			while (tmp != (void *)0)
+			while (*tmp)
 				tmp++;
 			get_text(lst, &inpt, tmp);
 			break ;
 		}
+		else if (ft_strchr(tmp, '\''))			//has single quote
+			get_quote(lst, &inpt, tmp, '\'');
+		else if (ft_strchr(tmp, '"'))			//has double quote
+			get_quote(lst, &inpt, tmp, '"');
 	}
 }
 
 //command arg1 "arg2" arg3 < input > output; command2 arg1 arg2 arg3 
-//command arg1 -> "arg2" -> arg3 < input > output; command2 arg1 arg2 arg3 
-//t_command(command arg1 -> "arg2" -> arg3 < input > output )=>t_command(command2 arg1 arg2 arg3)
-//t_command(command arg1 -> "arg2" -> arg3 )=>t_command(< input)=> t_command(> output )=>t_command(command2 arg1 arg2 arg3)
-//t_command(< input)=>t_command(command arg1 -> "arg2" -> arg3 )=> t_command(> output )=>t_command(command2 arg1 arg2 arg3)
+
+//TEXT			 Double_Q Text
+//command arg1 -> arg2 -> arg3 < input > output; command2 arg1 arg2 arg3 
+
+//				  TEXT			 Double_Q Text
+//t_command(args: command arg1 -> arg2 -> arg3 < input > output )=>t_command(args: command2 arg1 arg2 arg3)
+
+//t_command->args->t_list->content->t_token->t_tok_type tipo
+//										   ->t_token    string
+
 
 void	del_tok(void *a)
 {
@@ -159,11 +166,11 @@ void	ft_lst_iter(t_list *lst)
 	printf("\n\n");
 	while (lst)
 	{
-		printf("token: %s\n", ((t_token *)lst->content)->token);
+		printf("token: %s -> ", ((t_token *)lst->content)->token);
 		lst = lst->next;
 	}
 	iter++;
-	printf("iter: %d\n", iter);
+	printf("\n\n");
 }
 
 int	strarrsize(char **arr)
@@ -171,11 +178,8 @@ int	strarrsize(char **arr)
 	int		i;
 
 	i = 0;
-	while (arr)
-	{
-		arr++;
+	while (arr[i])
 		i++;
-	}
 	return (i);
 }
 
@@ -217,16 +221,20 @@ t_token	*new_token(char *content, t_tok_type type)
 void	col_split_parser(t_list **lst, t_list *current, char **split, t_command **dll_list)
 {
 	t_list		*next;
+	t_list		*before;
 	int			size;
 	int			i;
 	
 	size = strarrsize(split);
-	ft_lstbefore(*lst, current)->next = NULL; //make sure prev node doesnt point to free'd memory
+	before = ft_lstbefore(*lst, current);
+	if (before)
+		before->next = NULL; //make sure prev node doesnt point to free'd memory
+	else
+		*lst = NULL; // Or that lst doen't either (if it's the first node)
 	next = current->next; //get next node
 	ft_lstdelone(current, del_tok); //delete current node
 	//split the linked list into 2; lst and next
 	ft_lstadd_back(lst, ft_lstnew(new_token(split[0], TEXT))); //add first token at the end of the lst list
-	ft_lstadd_front(&next, ft_lstnew(new_token(split[size - 1], TEXT))); //add last token at the begining of next list. off by one?
 	dll_add_back(dll_list, dll_new(*lst)); //add lst list to first t_command
 	//what if there is a garbage value after the NUL
 	if (size > 2)
@@ -239,7 +247,7 @@ void	col_split_parser(t_list **lst, t_list *current, char **split, t_command **d
 		}
 	}
 	//make the last bit a sll node and assign it to lst
-	ft_lstadd_front(&next, ft_lstnew(new_token(split[size], TEXT)));
+	ft_lstadd_front(&next, ft_lstnew(new_token(split[size - 1], TEXT))); //add last token at the begining of next list. off by one?
 	*lst = next;
 }
 
@@ -260,27 +268,53 @@ void	col_end_parser(t_list **lst, t_list *current, t_command **dll_list)
 	*lst = tmp;//lst = next node 
 }
 
+void 	ft_print_split(char **str)
+{
+	int i;
+
+	i = 0;
+	while (str[i])
+	{
+		printf("%s\n", str[i]);
+		i++;
+	}
+}
+
+//because fuck norminette
+void	column_parser_cmds(t_list **lst, t_list *i, t_command **dll)
+{
+	char		**split;
+	
+	split = ft_split(((t_token *)i->content)->token, ';'); // split
+	col_split_parser(lst, i, split, dll);
+	ft_delete_split_arr(split);
+}
+
 //check what it does with just quotes
 t_command	*column_parser(t_list **lst)
 {
 	t_list		*i;
-	char		**split;
 	t_command	*dll;
+	t_token		*tmp;
 
 	i = *lst;
 	while (i)
 	{
-		if (((t_token *)i->content)->tok_type == TEXT
-			&& ft_strpbrk(((t_token *)i->content)->token, ";")
-			&& !is_lastchar(((t_token *)i->content)->token, ';'))
+		tmp = ((t_token *)i->content);
+		printf("%d : %s\n", tmp->tok_type, tmp->token);
+		if (tmp->tok_type == TEXT && ft_strpbrk(tmp->token, ";")
+			&& !is_lastchar(tmp->token, ';'))
 		{
-			split = ft_split(((t_token *)i->content)->token, ';'); // split
-			col_split_parser(lst, i, split, &dll);
-			ft_delete_split_arr(split);
+			column_parser_cmds(lst, i, &dll);
+			i = *lst;
+			continue ;
 		}
-		else if (((t_token *)i->content)->tok_type == TEXT
-				&& is_lastchar(((t_token *)i->content)->token, ';'))
+		else if (tmp->tok_type == TEXT && is_lastchar(tmp->token, ';'))
+		{
 			col_end_parser(lst, i, &dll);
+			i = *lst;
+			continue ;
+		}
 		i = i->next;
 	}
 	//add either the whole list if skipped while or the last part to a t_command
