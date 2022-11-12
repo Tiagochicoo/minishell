@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/05 12:32:04 by mimarque          #+#    #+#             */
-/*   Updated: 2022/11/08 22:23:52 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/11 21:44:47 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,6 +162,8 @@ t_command	*dll_new(t_list *lst)
 
 	new = malloc(sizeof(t_command));
 	new->args = lst;
+	new->next = NULL;
+	new->prev = NULL;
 	return (new);
 }
 

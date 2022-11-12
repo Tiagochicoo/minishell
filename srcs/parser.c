@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/11 00:27:09 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/11 21:44:33 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,6 +297,7 @@ t_command	*column_parser(t_list **lst)
 	t_command	*dll;
 	t_token		*tmp;
 
+	dll = NULL;
 	i = *lst;
 	while (i)
 	{
