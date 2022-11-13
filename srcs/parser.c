@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/11 21:44:33 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/13 17:25:26 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -252,18 +252,24 @@ void	col_split_parser(t_list **lst, t_list *current, char **split, t_command **d
 }
 
 //does this work? Não percam o proximo episódio porque nós tambem não
+//ps: não, não funcionava.
 void	col_end_parser(t_list **lst, t_list *current, t_command **dll_list)
 {
 	char	*dup;
 	char	*content;
 	t_list	*tmp;
+	t_list	*before;
 
 	content = ((t_token *)current->content)->token;
 	dup = ft_strndup(content, (ft_strsize(content) - 1));
 	free(content);
 	((t_token *)current->content)->token = dup;
 	tmp = current->next; //get next node
-	ft_lstbefore(*lst, current)->next = NULL; //get previous and set it to null
+	before = ft_lstbefore(*lst, current);
+	if (before)
+		before->next = NULL; //get previous and set it to null
+	else
+		current->next = NULL;
 	dll_add_back(dll_list, dll_new(*lst)); //make new dll node and add it to the back of the dll
 	*lst = tmp;//lst = next node 
 }
@@ -319,7 +325,8 @@ t_command	*column_parser(t_list **lst)
 		i = i->next;
 	}
 	//add either the whole list if skipped while or the last part to a t_command
-	dll_add_back(&dll, dll_new(*lst));
+	if (*lst)
+		dll_add_back(&dll, dll_new(*lst));
 	return (dll);
 }
 
