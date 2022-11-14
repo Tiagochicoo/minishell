@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/13 17:25:26 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/14 15:45:53 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,7 +166,7 @@ void	ft_lst_iter(t_list *lst)
 	printf("\n\n");
 	while (lst)
 	{
-		printf("token: %s -> ", ((t_token *)lst->content)->token);
+		printf("token: \"%s\" -> ", ((t_token *)lst->content)->token);
 		lst = lst->next;
 	}
 	iter++;
@@ -375,20 +375,30 @@ void	split_on_op(t_list *lst, char *pos, int op_size, int op)
 	int		size;
 	
 	temp = ((t_token *)lst->content)->token;
+	prev = NULL;
+	next = NULL;
 	//split token
-	size = (pos - 1) - temp; //get size up to operator
-	prev = malloc(sizeof(char) * size); 
-	ft_strncpy(prev, temp, size);
+	size = pos - temp; //get size up to operator
+	if (size > 0)
+		prev = ft_strndup(temp, size);
 	size = ft_strsize(temp) - (size + op_size); //get size after the operator
-	next = malloc(sizeof(char) * size);
-	ft_strncpy(next, (pos - 1 + op_size), size); //copy after the operator
+	if (size > 0)
+		next = ft_strndup((pos + op_size), size); //copy after the operator
 	//replace content on current node
+	if (prev && next)
+	{
+		((t_token *)lst->content)->token = prev;
+		//add new node
+		new = ft_lstnew(new_token(next, op));
+		new->next = lst->next;
+		lst->next = new;
+	}
+	else if (prev)
+		((t_token *)lst->content)->token = prev;
+	else if (next)
+		((t_token *)lst->content)->token = next;
 	free(temp);
-	((t_token *)lst->content)->token = prev;
-	//add new node
-	new = ft_lstnew(new_token(next, op));
-	new->next = lst->next;
-	lst->next = new;
+	((t_token *)lst->content)->tok_type = op;
 }
 
 void	operator_parser(t_command *list)
@@ -409,7 +419,8 @@ void	operator_parser(t_command *list)
 			if (op != NULL)
 			{
 				t_op = what_operator(op);
-				split_on_op(node, op, size_of_op(t_op), t_op);
+				if (content->tok_type != DOUBLE_Q && content->tok_type != SINGLE_Q)
+					split_on_op(node, op, size_of_op(t_op), t_op);
 			}
 			node = node->next;
 		}
@@ -432,7 +443,7 @@ void print_shit(t_command *list)
 		while (node)
 		{
 			content = ((t_token *)node->content);
-			printf("%d: %s -> ", content->tok_type, content->token);
+			printf("%d: \"%s\" -> ", content->tok_type, content->token);
 			node = node->next;
 		}
 		printf("\n");
