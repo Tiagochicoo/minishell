@@ -6,7 +6,7 @@
 /*   By: jdias-mo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/10 12:27:17 by jdias-mo          #+#    #+#             */
-/*   Updated: 2022/11/11 01:17:24 by jdias-mo         ###   ########.fr       */
+/*   Updated: 2022/11/11 15:48:09 by jdias-mo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ void	check_cmd(t_command *cmd)
 
 	//look for redirects
 }
+//falta funçao para separar comandos e argumentos entre cada pipe e alojar no cmd->*argv[]
+
 
 void	exec_pipes(t_command *cmd)
 {
@@ -33,7 +35,10 @@ void	exec_pipes(t_command *cmd)
 	}
 	cmd->pipe.i = -1;
 	while (++cmd->pipe.i < cmd->pipe.n)//while pipes func fork
+	{
 		child(cmd);
+		cmd = cmd->next; //a struct pipe tem os mesmo valores nos nodes t_command? se nao é preciso envia-la separadamente para as funçoes
+	}
 	i = -1;
 	while (++i < cmd->pipe.n)//closes
 		close(cmd->pipe.fd);
