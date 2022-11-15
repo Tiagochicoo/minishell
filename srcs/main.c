@@ -6,7 +6,7 @@
 /*   By: jdias-mo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/14 14:28:17 by jdias-mo         ###   ########.fr       */
+/*   Updated: 2022/11/15 15:35:12 by jdias-mo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ void eval(char *input, char **envp)
 		return ;
 	while (cmd.argv[0] && i < dll_size(cmd))		// enquanto houver comandos para executar
 	{
-		if (cmd.cmd_type == NONE) 
+		if (cmd.cmd_type == NONE)
 			file_exists(&cmd, background);
 		else
 			run_builtin_cmd(&cmd);
