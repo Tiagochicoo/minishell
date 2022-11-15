@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/14 15:45:53 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/15 17:41:15 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -332,7 +332,7 @@ t_command	*column_parser(t_list **lst)
 
 char	*find_operator(char *str)
 {
-	return (ft_strpbrk(str, "><|&"));
+	return (ft_strpbrk(str, "><|&()"));
 }
 
 int	what_operator(char *op)
@@ -353,6 +353,10 @@ int	what_operator(char *op)
 	 	return (PIPE);
 	else if (*op == '&' && *(op + 1) == '&')
 		return (AND);
+	else if (*op == '(')
+	 	return (OPEN_P);
+	else if (*op == ')')
+		return (CLOSE_P);
 	return (ERROR);
 }
 
@@ -360,24 +364,44 @@ int	size_of_op(int op)
 {
 	if (op == APPEND || op == HFILE || op == OR || op == AND)
 		return (2);
-	else if (op == PIPE || op == OUTPUT || op == INPUT)
+	else if (op == PIPE || op == OUTPUT || op == INPUT || op == OPEN_P || op == CLOSE_P)
 	 	return (1);
 	else
 		return (0);
 }
 
+t_list *add_par_node(int op)
+{
+	t_token	*new;
+	t_list	*new_node;
+	char	*str;
+
+	if (op == OPEN_P)
+		str = ft_strdup("(");
+	else
+		str = ft_strdup(")");
+	new = new_token(str, op);
+	new_node = ft_lstnew(new);
+	return (new_node);
+}
+
 void	split_on_op(t_list *lst, char *pos, int op_size, int op)
 {
-	char	*temp;
-	char	*prev;
-	char	*next;
-	t_list	*new;
-	int		size;
+	char	*temp; //node content
+	char	*prev; //text before operator
+	char	*next; //text after the operator
+	t_list	*new; //new node to be added (text after operator)
+	t_list	*par; //node if open or close parenthesis
+	t_list	*seg; //next node
+	int		size; //size of the text before or after the operator
+
 	
 	temp = ((t_token *)lst->content)->token;
 	prev = NULL;
 	next = NULL;
+	seg = lst->next;
 	//split token
+	
 	size = pos - temp; //get size up to operator
 	if (size > 0)
 		prev = ft_strndup(temp, size);
@@ -385,20 +409,67 @@ void	split_on_op(t_list *lst, char *pos, int op_size, int op)
 	if (size > 0)
 		next = ft_strndup((pos + op_size), size); //copy after the operator
 	//replace content on current node
+	//prev stays on the same node
+	//if there are parenthesis, add them after prev
+	//next goes to a new node
 	if (prev && next)
 	{
 		((t_token *)lst->content)->token = prev;
 		//add new node
 		new = ft_lstnew(new_token(next, op));
-		new->next = lst->next;
-		lst->next = new;
+		if (op == OPEN_P || op == CLOSE_P)
+		{
+			par = add_par_node(op);
+			((t_token *)new->content)->tok_type = TEXT;
+			lst->next = par;
+			par->next = new;
+			new->next = seg;
+		}
+		else
+		{
+			new->next = seg;
+			lst->next = new;
+		}
 	}
 	else if (prev)
+	{
 		((t_token *)lst->content)->token = prev;
+		if (op == OPEN_P || op == CLOSE_P)
+		{
+			par = add_par_node(op);
+			lst->next = par;
+			par->next = seg;
+		}
+		else
+			lst->next = seg;
+	}
 	else if (next)
-		((t_token *)lst->content)->token = next;
+	{
+		//((t_token *)lst->content)->tok_type = op;
+		if (op == OPEN_P || op == CLOSE_P)
+		{	
+			if(op == OPEN_P)
+			{
+				((t_token *)lst->content)->tok_type = OPEN_P;
+				((t_token *)lst->content)->token = ft_strdup("(");
+			}
+			else
+			{
+				((t_token *)lst->content)->tok_type = CLOSE_P;
+				((t_token *)lst->content)->token = ft_strdup(")");
+			}
+			lst->next = ft_lstnew(new_token(next, op));
+			lst->next->next = seg;
+		}
+		else
+		{
+			((t_token *)lst->content)->token = next;
+			lst->next = seg;
+		}
+	}
+	if (((bool)prev ^ (bool)next) && !(op == OPEN_P || op == CLOSE_P)) //if one is null and the other is not
+		((t_token *)lst->content)->tok_type = op;
 	free(temp);
-	((t_token *)lst->content)->tok_type = op;
 }
 
 void	operator_parser(t_command *list)
@@ -419,7 +490,7 @@ void	operator_parser(t_command *list)
 			if (op != NULL)
 			{
 				t_op = what_operator(op);
-				if (content->tok_type != DOUBLE_Q && content->tok_type != SINGLE_Q)
+				if (content->tok_type != DOUBLE_Q && content->tok_type != SINGLE_Q) //Don't split if in quotes
 					split_on_op(node, op, size_of_op(t_op), t_op);
 			}
 			node = node->next;
@@ -428,11 +499,86 @@ void	operator_parser(t_command *list)
 	}
 }
 
+//needs to free char *str
+//trim whitespace from the beginning and end of a string
+char	*trim_whitespace(char *str)
+{
+	int		i;
+	int		j;
+	int		len;
+	char	*new;
+
+	i = 0;
+	j = 0;
+	len = ft_strsize(str);
+	while (str[i] == ' ' || str[i] == '\t')
+		i++;
+	while (str[len - 1] == ' ' || str[len - 1] == '\t')
+		len--;
+	new = malloc(sizeof(char) * (len - i + 1));
+	while (i < len)
+		new[j++] = str[i++];
+	new[j] = '\0';
+	return (new);
+}
+
+//for each node in the t_list if the token is not a OPEN_P or CLOSE_P or DOUBLE_Q or SINGLE_Q
+//doon't forguet to free the t_token content after triming whitespace
+void	trim_whitespace_parser(t_command *list)
+{
+	t_token	*content;
+	t_list	*node;
+	char	*temp;
+
+	while (list)
+	{
+		node = ((t_list *)list->args);
+		while (node)
+		{
+			content = ((t_token *)node->content);
+			temp = content->token;
+			if (content->tok_type != OPEN_P && content->tok_type != CLOSE_P
+				&& content->tok_type != DOUBLE_Q && content->tok_type != SINGLE_Q)
+			{
+				content->token = trim_whitespace(temp);
+				free(temp);
+			}
+			node = node->next;
+		}
+		list = list->next;
+	}
+}
+
+//what about parenthesis?
+//if the t_list node token is AND or OR, make a new t_command node with the current and next t_list nodes
+void split_and_or(t_command *current)
+{
+	t_list		*node;
+	t_list		*temp;
+
+	node = current->args;
+	while (node)
+	{
+		if (((t_token *)node->content)->tok_type == AND || ((t_token *)node->content)->tok_type == OR)
+		{
+			dll_add_after(current, dll_new(node));
+			temp = ft_lstbefore(current->args, node);
+			if (!temp)
+				perror("no command before AND/OR");
+			temp->next = NULL;
+		}
+		else
+			node = node->next;
+	}
+}
+
 void print_shit(t_command *list)
 {
 	t_token	*content;
 	t_list	*node;
 	int		n;
+	int		op;
+	char	*text;
 
 	n = 1;
 	while (list)
@@ -442,8 +588,32 @@ void print_shit(t_command *list)
 		node = ((t_list *)list->args);
 		while (node)
 		{
+			op = ((t_token *)node->content)->tok_type;
 			content = ((t_token *)node->content);
-			printf("%d: \"%s\" -> ", content->tok_type, content->token);
+			//turn tok_type to text
+			if (op == ERROR)
+				text = "ERROR";
+			else if (op == APPEND)
+				text = "APPEND";
+			else if (op == OUTPUT)
+			 	text = "OUTPUT";
+			else if (op == HFILE)
+				text = "HFILE";
+			else if (op == INPUT)
+			 	text = "INPUT";
+			else if (op == OR)
+				text = "OR";
+			else if (op == PIPE)
+			 	text = "PIPE";
+			else if (op == AND)
+				text = "AND";
+			else if (op == OPEN_P)
+			 	text = "(";
+			else if (op == CLOSE_P)
+				text = ")";
+			else
+				text = "TEXT";
+			printf("%s: \"%s\" -> ", text, content->token);
 			node = node->next;
 		}
 		printf("\n");

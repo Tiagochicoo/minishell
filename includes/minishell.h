@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/10 21:59:51 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/14 18:43:39 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,10 @@ typedef enum e_tok_type
 	APPEND,
 	PIPE,
 	OR,
-	AND
+	AND,
+	OPEN_P,
+	CLOSE_P,
+	
 }
 t_tok_type;
 
