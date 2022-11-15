@@ -6,7 +6,7 @@
 /*   By: jdias-mo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/15 15:05:21 by jdias-mo         ###   ########.fr       */
+/*   Updated: 2022/11/15 17:17:03 by jdias-mo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ typedef struct	s_pipe		// pipe struct
 	int	i;
 	int	**fd;
 	int	n;
-	int	pid;
 }				t_pipe
 
 typedef struct s_token

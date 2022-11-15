@@ -5,69 +5,158 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jdias-mo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/10 12:27:17 by jdias-mo          #+#    #+#             */
-/*   Updated: 2022/11/11 15:48:09 by jdias-mo         ###   ########.fr       */
+/*   Created: 2022/11/14 15:31:36 by jdias-mo          #+#    #+#             */
+/*   Updated: 2022/11/15 17:41:14 by jdias-mo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-void	check_cmd(t_command *cmd)
+int	n_pipe(t_command *cmd)//conta pipes
 {
-	//look for pipes
+	int	i;
+	int	n;
 
-	//look for redirects
+	i = 0;
+	n = 0;
+	while (i < ft_lstsize(cmd->args))
+	{
+		if ((cmd->args)->content.tok_type == 'PIPE')
+			n++;
+		cmd->args = (cmd->args)->next;
+	}
+	return (n);
 }
-//falta funçao para separar comandos e argumentos entre cada pipe e alojar no cmd->*argv[]
 
-
-void	exec_pipes(t_command *cmd)
+void	has_redirects(t_command *cmd) //adicionar redirects ao t_cmd input e output. falta funçao para executar redirect
 {
 	int	i;
 
-	cmd->pipe.fd = malloc(sizeof(int) * 2 * cmd->pipe.n);//malloc pipe
-	i = 0;
-	while (i < cmd->pipe.n) //create pipes
+	i = 0
+	while (i < ft_lstsize(cmd->args))
 	{
-		if (pipe(cmd->pipe.fd + 2 * i) == -1)
-			return ; //free
+		if ((cmd->args)->content.tok_type == 'INPUT')
+			cmd->input = (cmd->args)->content->token;
+		else if ((cmd->args)->content.tok_type == 'OUTPUT' || (cmd->args)->content.tok_type == 'APPEND')
+			cmd->output = (cmd->args)->content->token;
 		i++;
+		cmd->args = (cmd->args)->next;
 	}
-	cmd->pipe.i = -1;
-	while (++cmd->pipe.i < cmd->pipe.n)//while pipes func fork
-	{
-		child(cmd);
-		cmd = cmd->next; //a struct pipe tem os mesmo valores nos nodes t_command? se nao é preciso envia-la separadamente para as funçoes
-	}
-	i = -1;
-	while (++i < cmd->pipe.n)//closes
-		close(cmd->pipe.fd);
-	waitpid(-1, NULL, 0);
-	//frees
 }
 
-void	_dup2(int in, int out)
+void	parse_pipe(t_command *cmd) //adicionar comando e argumentos ao argv. um por string. incompleto
 {
-	dup2(in, 0);
-	dup2(out, 1);
-}
+	int		i;
+	char	*tmp;
 
-void	child(t_command *cmd)
-{
-	pid_t pid;
-
-	pid = fork();
-	if (!pid)
+	i = 0;
+	while (i < ft_lstsize(cmd->args))
 	{
-		if (cmd->pipe.i == 0)							// primeiro pipe
-			_dup2(0, cmd->pipe.fd[1]);
-		else if (cmd->pipe.i == cmd->pipe.n - 1)		// ultimo pipe
-			_dup2(cmd->pipe.fd[cmd->pipe.i * 2 - 2], 1);
-		else											// pipes do meio
-			_dup2(cmd->pipe.fd[cmd->pipe.i * 2 - 2], cmd->pipe.fd[cmd->pipe.i * 2 - 1]);
-		execve(ft_findcmd(cmd), cmd->argv, cmd->envp);	// tem q avançar no comando e args com o index dos pipes.
+		if (((cmd->args)->next->content.tok_type == 'PIPE' && (cmd->args)->content->tok_type == 'TEXT') || (cmd->args)->content.tok_type == 'PIPE')
+		{
+			if (!cmd->argv[i])
+				cmd->argv[i] = ft_strdup((cmd->args)->content->token);
+			i++;
+			cmd->args = (cmd->args)->next;
+		}
 	}
 }
-//faltam frees, error checks e raciocionio. o comando a executar e pipes tem que avançar com os pipes.
-//t_command por cada pipe? com variavel na struct para pipe?
-//ou ir buscar comandos e argumentos entre cada pipe à LL
+
+void	run_pipes(t_command *cmd)//cria process child e faz redirects e piping antes de executar
+{
+	cmd->pipe.pid = fork();
+	if(!cmd->pipe.pid)
+	{
+		if(pipe.i == 0)
+		{
+			if (cmd->input)
+				dup2(input, 0);//redirect falta funçao
+			dup2(cmd->pipe.fd[0][1], 1);
+		}
+		else if(cmd->pipe.i > 0 && cmd->pipe.i < cmd->pipe.n)
+		{
+			dup2(cmd->pipe.fd[cmd->pipe.i][0], 0);
+			dup2(cmd->pipe.fd[cmd->pipe.i][1], 1);
+		}
+		else if(pipe.i == pipe.n)
+		{
+			if (cmd->output)
+				dup2(y, 1);//redirect falta funçao
+			dup2(cmd->pipe.fd[i][0], 0);
+		}
+		close_pipes(cmd);
+		if (cmd->type == NONE)
+			exec(cmd);
+		else
+			run_builtin_cmd(cmd);
+	}
+}
+
+void	close_pipes(t_command *cmd)//fechar pipes
+{
+	int	i;
+
+	i = 0;
+	while (i < cmd->pipe.n)
+	{
+		close(cmd->pipe.fd[i][0]);
+		close(cmd->pipe.fd[i][1]);
+	}
+}
+
+void	run(t_command *cmd)//faz redirects e executa comando sem pipes
+{
+	int	pid;
+
+	if(!pid = fork())
+	{
+		if (cmd->input)
+			dup2(input, 0);//falta funçao redirects
+		if (cmd->output)
+			dup2(output, 1);
+		if (cmd->type == NONE)
+			exec(cmd);
+		else
+			run_builtin_cmd(cmd);
+	}
+}
+
+void	exec(t_command *cmd)//executa comando e argumentos em argv
+{
+	pid_t childPid;
+	char	*path;
+
+	path = cmd->argv[0];
+	if (execve(path, "grep", "me", cmd->envp) < 0)
+	{
+		printf("%sError: command not found: %s%s\n", RED, RESET, cmd->argv[0]);
+		exit(0);
+	}
+	free(path);
+}
+
+void	executor(t_command *cmd)//verifica redirects e pipes. parse comandos pipe. cria pipes. trata dos pipes e executa ou executa tb se nao tiver pipes.
+{
+	has_redirects(cmd);
+	cmd->pipe.i = 0;
+	if ((cmd->pipe.n = has_pipe(cmd)))
+	{
+		parse_pipe(cmd);
+		cmd->pipe->fd = malloc(sizeof(int *) * cmd->pipe->n);
+		while (cmd->pipe.i < cmd->pipe.n)
+		{
+			cmd->pipe->fd[cmd->pipe.i] = malloc(sizeof(int) * 2);
+			run_pipes(cmd);
+			cmd->pipe.i++;
+		}
+		close_pipes(cmd);
+		waitpid(-1, NULL, 0);
+	}
+	else
+	{
+		run(cmd);
+		waitpid(-1, NULL, 0);
+	}
+}
+
+//faltam frees, closes?, error checks,...

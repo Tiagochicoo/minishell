@@ -6,7 +6,7 @@
 /*   By: jdias-mo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/15 15:35:12 by jdias-mo         ###   ########.fr       */
+/*   Updated: 2022/11/15 15:51:48 by jdias-mo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,17 +124,12 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 		error("fork() error");
 	else if (childPid == 0)							// I'm the child and could run a command
 	{
-		if (execve(path, cmd->argv, cmd->envp) < 0)	// EXECVE != EXECVP
+		if (execve(path, "grep", "me", cmd->envp) < 0)	// EXECVE != EXECVP
 		{
 			printf("%sError: command not found: %s%s\n", RED, RESET, cmd->argv[0]);
 			exit(0);
 		}
 		free(path);
-	}
-	else	// I'm the parent. Shell continues here.
-	{
-		 if (bg)
-			printf("Child in background [%d]\n",childPid);
 		 else
 			wait(&childPid);
 	}
