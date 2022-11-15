@@ -6,7 +6,7 @@
 /*   By: jdias-mo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 15:31:36 by jdias-mo          #+#    #+#             */
-/*   Updated: 2022/11/15 17:43:17 by jdias-mo         ###   ########.fr       */
+/*   Updated: 2022/11/15 18:00:30 by jdias-mo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void	run_pipes(t_command *cmd)//cria process child e faz redirects e piping ante
 		}
 		close_pipes(cmd);
 		if (cmd->type == NONE)
-			exec(cmd);
+			file_exists(cmd);
 		else
 			run_builtin_cmd(cmd);
 	}
@@ -112,23 +112,38 @@ void	run(t_command *cmd)//faz redirects e executa comando sem pipes
 	if(!pid = fork())
 	{
 		if (cmd->input)
-			dup2(input, 0);//falta funçao redirects
+			dup2(input, 0);//falta funçao redirects para fazer opens e dups
 		if (cmd->output)
 			dup2(output, 1);
 		if (cmd->type == NONE)
-			exec(cmd);
+			file_exists(cmd);
 		else
 			run_builtin_cmd(cmd);
 	}
 }
 
+void	file_exists(t_command *cmd)//possivelmente fazer uma nova funcao p isto
+{
+	char	*tmp;
+
+	tmp = ft_find_cmd(cmd);
+	if (tmp != NULL)
+		exec(cmd);
+	else if (!access(cmd->argv[0], F_OK))
+	{
+		if (!access(cmd->argv[0], X_OK))
+			exec(cmd);
+		else
+			perror("Error");
+	}
+}
+
 void	exec(t_command *cmd)//executa comando e argumentos em argv
 {
-	pid_t childPid;
 	char	*path;
 
 	path = cmd->argv[0];
-	if (execve(path, "grep", "me", cmd->envp) < 0)
+	if (execve(path, cmd->argv, cmd->envp) < 0)
 	{
 		printf("%sError: command not found: %s%s\n", RED, RESET, cmd->argv[0]);
 		exit(0);
@@ -136,7 +151,7 @@ void	exec(t_command *cmd)//executa comando e argumentos em argv
 	free(path);
 }
 
-void	executor(t_command *cmd)//verifica redirects e pipes. parse comandos pipe. cria pipes. trata dos pipes e executa ou executa tb se nao tiver pipes.
+void	executor(t_command *cmd)//verifica redirects e pipes. parse comandos pipe. cria pipes. trata dos pipes e executa ou executa tb se nao tiver pipes. eval() executaria isto em loop.
 {
 	has_redirects(cmd);
 	cmd->pipe.i = 0;
@@ -160,4 +175,4 @@ void	executor(t_command *cmd)//verifica redirects e pipes. parse comandos pipe. 
 	}
 }
 
-//faltam frees, closes?, error checks,...
+//faltam frees, closes?, error checks, pointers e & nao devem tar bem, falta funçoes...
