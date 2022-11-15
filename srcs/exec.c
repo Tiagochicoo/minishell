@@ -6,7 +6,7 @@
 /*   By: jdias-mo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 15:31:36 by jdias-mo          #+#    #+#             */
-/*   Updated: 2022/11/15 17:41:14 by jdias-mo         ###   ########.fr       */
+/*   Updated: 2022/11/15 17:43:17 by jdias-mo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,8 @@ void	parse_pipe(t_command *cmd) //adicionar comando e argumentos ao argv. um por
 
 void	run_pipes(t_command *cmd)//cria process child e faz redirects e piping antes de executar
 {
-	cmd->pipe.pid = fork();
+	int	pid;
+	pid = fork();
 	if(!cmd->pipe.pid)
 	{
 		if(pipe.i == 0)
