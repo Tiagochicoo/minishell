@@ -78,6 +78,37 @@ int parse(const char *input, t_command *cmd)
 	return is_bg;
 }
 
+void	del_empty_nodes(t_command *list)
+{
+	t_list *current;
+	t_list *prev;
+	t_list *lst;
+
+	while (list)
+	{
+		lst = list->args;
+		current = lst;
+		while (current)
+		{
+			prev = ft_lstbefore(lst, current);
+			if (prev)
+				if (((t_token *)current->content)->tok_type == TEXT)
+					if (!ft_strcmp(((t_token *)current->content)->token, ""))
+					{
+						printf("1test\n");
+						prev->next = current->next;
+						printf("2test\n");
+						ft_lstdelone(current, del_tok);
+						printf("3test\n");
+						current = prev->next;
+						continue ;
+					}
+			current = current->next;
+		}
+		list = list->next;
+	}
+}
+
 void	parser(char *input)
 {
 	t_list		*lst;
@@ -90,6 +121,8 @@ void	parser(char *input)
 	//ft_lst_iter(lst);
 	list = column_parser(&lst);
 	operator_parser(list);
+	trim_whitespace_parser(list);
+	del_empty_nodes(list);
 	print_shit(list);
 	
 	// if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?

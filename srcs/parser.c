@@ -338,21 +338,22 @@ char	*find_operator(char *str)
 int	what_operator(char *op)
 {
 	if (!*(op + 1))
-		return(ERROR);
-	if (*op == '>' && *(op + 1) == '>')
-		return (APPEND);
-	else if (*op == '>')
+	{
+		if (*op == '>' && *(op + 1) == '>')
+			return (APPEND);
+		else if (*op == '<' && *(op + 1) == '<')
+			return (HFILE);
+		else if (*op == '|' && *(op + 1) == '|')
+			return (OR);
+		else if (*op == '&' && *(op + 1) == '&')
+			return (AND);
+	}
+	if (*op == '>')
 	 	return (OUTPUT);
-	else if (*op == '<' && *(op + 1) == '<')
-		return (HFILE);
 	else if (*op == '<')
 	 	return (INPUT);
-	else if (*op == '|' && *(op + 1) == '|')
-		return (OR);
 	else if (*op == '|')
 	 	return (PIPE);
-	else if (*op == '&' && *(op + 1) == '&')
-		return (AND);
 	else if (*op == '(')
 	 	return (OPEN_P);
 	else if (*op == ')')
@@ -467,9 +468,13 @@ void	split_on_op(t_list *lst, char *pos, int op_size, int op)
 			lst->next = seg;
 		}
 	}
-	if (((bool)prev ^ (bool)next) && !(op == OPEN_P || op == CLOSE_P)) //if one is null and the other is not
+	else
+	{
 		((t_token *)lst->content)->tok_type = op;
+		((t_token *)lst->content)->token = "";
+	}
 	free(temp);
+	
 }
 
 void	operator_parser(t_command *list)

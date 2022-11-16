@@ -84,7 +84,6 @@ typedef enum e_tok_type
 	AND,
 	OPEN_P,
 	CLOSE_P,
-	
 }
 t_tok_type;
 
@@ -131,6 +130,7 @@ int			what_operator(char *op);
 int			size_of_op(int op);
 void		split_on_op(t_list *lst, char *pos, int op_size, int op);
 void		operator_parser(t_command *list);
+void		trim_whitespace_parser(t_command *list);
 void 		print_shit(t_command *list); //remove!
 
 void dll_add_back(t_command **lst, t_command *new);
