@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/15 17:41:15 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/15 18:30:43 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -611,6 +611,10 @@ void print_shit(t_command *list)
 			 	text = "(";
 			else if (op == CLOSE_P)
 				text = ")";
+			else if (op == DOUBLE_Q)
+			 	text = "DOUBLE_Q";
+			else if (op == SINGLE_Q)
+				text = "SINGLE_Q";
 			else
 				text = "TEXT";
 			printf("%s: \"%s\" -> ", text, content->token);
