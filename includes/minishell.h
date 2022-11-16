@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/14 18:43:39 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/16 18:33:17 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ typedef struct s_token
 	char	*token;
 }		t_token;
 
-typedef struct s_command
+typedef struct s_command                         /// TODO: Change from t_list args to char *token for each t_cmd node + add token_type
 {
 	int			argc;				// number of args
 	char		*argv[MAXARGS];		// arguments list
