@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/14 18:43:39 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/17 18:09:07 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,9 +129,10 @@ t_command	*column_parser(t_list **lst);
 char		*find_operator(char *str);
 int			what_operator(char *op);
 int			size_of_op(int op);
-void		split_on_op(t_list *lst, char *pos, int op_size, int op);
+void		split_on_op(t_list *current, char *pos, int op_size, int op);
 void		operator_parser(t_command *list);
 void 		print_shit(t_command *list); //remove!
+void		trim_whitespace_parser(t_command *list);
 
 void dll_add_back(t_command **lst, t_command *new);
 void dll_add_front(t_command **lst, t_command *new);

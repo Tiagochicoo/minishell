@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/15 18:28:00 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/17 14:24:34 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,9 +87,10 @@ void	parser(char *input)
 	if (input == NULL)
 		error("command line is NULL\n");
 	quote_parser(&lst, input);
-	//ft_lst_iter(lst);
+	ft_lst_iter(lst);
 	list = column_parser(&lst);
 	operator_parser(list);
+	trim_whitespace_parser(list);
 	print_shit(list);
 	
 	// if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?
