@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/05 12:32:04 by mimarque          #+#    #+#             */
-/*   Updated: 2022/11/11 21:44:47 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/20 00:46:43 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,22 +140,6 @@ int	dll_size(t_command *lst)
 	return (count);
 }
 
-void	dll_iter(t_command *lst, int property, void (*f)(void *))
-{
-	if (!lst || !property || !f)
-		return ;
-	while (lst)
-	{
-		if(property == 1)
-			f(lst->argv);
-		if(property == 2)
-			f(lst->args);
-		if(property == 3)
-			f(lst->envp);
-		lst = lst->next;
-	}
-}
-
 t_command	*dll_new(t_list *lst)
 {
 	t_command *new;
@@ -177,3 +161,24 @@ void	dll_gethead(t_command **lst)
 		while (*lst != NULL)
 			*lst = (*lst)->prev;
 }
+
+//for each t_list in each t_command do function f
+//pass current t_command, current t_list and head of t_list
+void	dll_iter(t_command *lst, void (*f)(t_command *current, t_list *head, t_list *lst))
+{
+	t_list *current;
+
+	if (!lst || !f)
+		return ;
+	while (lst)
+	{
+		current = lst->args;
+		while (current)
+		{
+			f(lst, lst->args, current);
+			current = lst->args->next;
+		}
+		lst = lst->next;
+	}
+}
+

@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/17 14:16:44 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/20 01:04:20 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,9 +145,8 @@ void	quote_parser(t_list **lst, char *input)
 //				  TEXT			 Double_Q Text
 //t_command(args: command arg1 -> arg2 -> arg3 < input > output )=>t_command(args: command2 arg1 arg2 arg3)
 
-//t_command->args->t_list->content->t_token->t_tok_type tipo
-//										   ->t_token    string
-
+//
+//t_command(args: command arg1 -> arg2 -> arg3)=>t_command(< input)=>t_command(> output)=>t_command(args: command2 arg1 arg2 arg3)
 
 void	del_tok(void *a)
 {
@@ -542,52 +541,302 @@ void split_and_or(t_command *current)
 	}
 }
 
+//split string on spaces into other strings
+//if the string is in quotes, don't split on spaces
+char	**split_on_spaces(char *str)
+{
+	int		i;
+	int		j;
+	int		k;
+	char	**new;
+
+	i = 0;
+	j = 0;
+	k = 0;
+	new = ft_calloc(sizeof(char *), ft_strsize(str) + 1); 
+	while (str[i])
+	{
+		if (str[i] == ' ' || str[i] == '\t')
+		{
+			new[j] = ft_strndup(str + k, i - k);
+			j++;
+			k = i + 1;
+		}
+		i++;
+	}
+	new[j] = ft_strndup(str + k, i - k);
+	return (new);
+}
+
+//free the char **array
+void	free_char_array(char **array)
+{
+	int	i;
+
+	i = 0;
+	while (array[i])
+	{
+		free(array[i]);
+		i++;
+	}
+	free(array);
+}
+
+//get the current string array and add the new string array to it
+char	**add_to_array(char **array, char **new)
+{
+	int		i;
+	int		j;
+	char	**new_array;
+
+	i = 0;
+	j = 0;
+	while (array[i])
+		i++;
+	while (new[j])
+		j++;
+	new_array = ft_calloc(sizeof(char *), i + j + 1);
+	i = 0;
+	j = 0;
+	while (array[i])
+	{
+		new_array[i] = array[i];
+		i++;
+	}
+	while (new[j])
+	{
+		new_array[i] = new[j];
+		i++;
+		j++;
+	}
+	return (new_array);
+}
+
+//for each t_command node go trough each t_list node (args) 
+//tokenize the content of node->token on space and put them by order on argv
+void put_node_token_on_argv(t_command *list)
+{
+	char	**temp;
+	t_list 	*lst;
+
+	while (list)
+	{
+		//for each args t_list node
+		lst = list->args;
+		while (lst)
+		{
+			//hold the current argv to free it later
+			temp = list->argv;
+			//spit the lst->token string on space and add them to argv
+			list->argv = add_to_array(list->argv, split_on_spaces(((t_token *)lst->content)->token));
+			//free the old argv
+			free_char_array(temp);
+			lst = lst->next;
+		}
+		list = list->next;
+	}
+	
+}
+
+//is double quotes or single quotes?
+//uses bitmasking to check if the tok_type is DOUBLE_Q or SINGLE_Q
+int is_quotes(t_token *token)
+{
+	return (token->tok_type & QUOTE);
+}
+
+//if operator
+//uses bitmasking to check if the token is an operator
+int	is_operator(t_token *token)
+{
+	if (token->tok_type & OPERATOR)
+		return (1);
+	return (0);
+}
+
+//for each t_command node go trough each t_list node (args)
+//if the token is a OPEN_P get all the tokens until the MATCHING CLOSE_P and put them in a new t_command node
+//it is very important that we don't match the immediate next CLOSE_P if there is another OPEN_P before it
+void split_on_parenthesis(t_command *current)
+{
+	t_list		*node;
+	t_list		*temp;
+	t_list		*new;
+	int			count;
+
+	node = current->args;
+	while (node)
+	{
+		if (((t_token *)node->content)->tok_type == OPEN_P)
+		{
+			count = 1;
+			temp = node->next;
+			while (temp)
+			{
+				if (((t_token *)temp->content)->tok_type == OPEN_P)
+					count++;
+				if (((t_token *)temp->content)->tok_type == CLOSE_P)
+					count--;
+				if (count == 0)
+					break;
+				temp = temp->next;
+			}
+			if (!temp)
+				perror("no matching close parenthesis");
+			new = ft_lstbefore(node->next, temp);
+			dll_add_after(current, dll_new(new));
+			node->next = temp->next;
+			free(temp);
+		}
+		else
+			node = node->next;
+	}
+}
+
+//for each t_command node go trough each t_list node (args)
+//if the token is a OPERATOR, split the t_list node and add the new t_list node to a new t_command node
+//removing the node with the operator and adding its tok_type to the new t_command node
+void split_on_operators(t_command *list)
+{
+	t_list		*node;
+	t_list		*temp;
+	t_command	*new;
+
+	while (list)
+	{
+		node = list->args;
+		while (node)
+		{
+			if (is_operator((t_token *)node->content))
+			{
+				new = dll_new(node->next);
+				new->tok_type = ((t_token *)node->content)->tok_type;
+				temp = ft_lstbefore(list->args, node);
+				if (!temp)
+					perror("no command before operator");
+				temp->next = NULL;
+				dll_add_after(list, new);
+				ft_lstdelone(node, del_tok);
+				break;
+			}
+			node = node->next;
+		}
+		list = list->next;
+	}
+}
+
+//remove empty t_list nodes
+void remove_empty_nodes(t_command *list)
+{
+	t_list	*node;
+	t_list	*temp;
+	t_list	*prev;
+
+	while (list)
+	{
+		node = list->args;
+		while (node)
+		{
+			if (!ft_strlen(((t_token *)node->content)->token))
+			{
+				temp = node->next;
+				//get the previous node and set its next to the next node
+				prev = ft_lstbefore(list->args, node);
+				if (prev)
+					prev->next = temp;
+				else
+					list->args = temp;
+				ft_lstdelone(node, del_tok);
+				node = temp;
+			}
+			else
+				node = node->next;
+		}
+		list = list->next;
+	}
+}
+
+//returns a string with the token type from the e_token_type enum
+char *get_token_type(t_token *token)
+{
+	if (token->tok_type == TEXT)
+		return ("TEXT");
+	if (token->tok_type == OPEN_P)
+		return ("(");
+	if (token->tok_type == CLOSE_P)
+		return (")");
+	if (token->tok_type == SINGLE_Q)
+		return ("SINGLE_Q");
+	if (token->tok_type == DOUBLE_Q)
+		return ("DOUBLE_Q");
+	if (token->tok_type == PIPE)
+		return ("|");
+	if (token->tok_type == SEMICOLON)
+		return (";");
+	if (token->tok_type == AND)
+		return ("&&");
+	if (token->tok_type == OR)
+		return ("||");
+	if (token->tok_type == INPUT)
+		return ("<");
+	if (token->tok_type == OUTPUT)
+		return (">");
+	if (token->tok_type == APPEND)
+		return (">>");
+	if (token->tok_type == HFILE)
+		return ("<<");
+	return ("");
+}
+
+//gets the token type from the e_token_type enum from t_command->tok_type
+char *get_command_type(t_command *token)
+{
+	if (token->tok_type == TEXT)
+		return ("TEXT");
+	if (token->tok_type == OPEN_P)
+		return ("(");
+	if (token->tok_type == CLOSE_P)
+		return (")");
+	if (token->tok_type == SINGLE_Q)
+		return ("SINGLE_Q");
+	if (token->tok_type == DOUBLE_Q)
+		return ("DOUBLE_Q");
+	if (token->tok_type == PIPE)
+		return ("|");
+	if (token->tok_type == SEMICOLON)
+		return (";");
+	if (token->tok_type == AND)
+		return ("&&");
+	if (token->tok_type == OR)
+		return ("||");
+	if (token->tok_type == INPUT)
+		return ("<");
+	if (token->tok_type == OUTPUT)
+		return (">");
+	if (token->tok_type == APPEND)
+		return (">>");
+	if (token->tok_type == HFILE)
+		return ("<<");
+	return ("");
+}
+
+
 void print_shit(t_command *list)
 {
 	t_token	*content;
 	t_list	*node;
 	int		n;
-	int		op;
-	char	*text;
 
 	n = 1;
 	while (list)
 	{
 		printf("\n");
-		printf("%d => ", n);
+		printf("%d %s => ", n, get_command_type(list));
 		node = ((t_list *)list->args);
 		while (node)
 		{
-			op = ((t_token *)node->content)->tok_type;
 			content = ((t_token *)node->content);
-			//turn tok_type to text
-			if (op == ERROR)
-				text = "ERROR";
-			else if (op == APPEND)
-				text = "APPEND";
-			else if (op == OUTPUT)
-			 	text = "OUTPUT";
-			else if (op == HFILE)
-				text = "HFILE";
-			else if (op == INPUT)
-			 	text = "INPUT";
-			else if (op == OR)
-				text = "OR";
-			else if (op == PIPE)
-			 	text = "PIPE";
-			else if (op == AND)
-				text = "AND";
-			else if (op == OPEN_P)
-			 	text = "(";
-			else if (op == CLOSE_P)
-				text = ")";
-			else if (op == DOUBLE_Q)
-			 	text = "DOUBLE_Q";
-			else if (op == SINGLE_Q)
-				text = "SINGLE_Q";
-			else
-				text = "TEXT";
-			printf("%s: \"%s\" -> ", text, content->token);
+			printf("%s: \"%s\" -> ", get_token_type(content), content->token);
 			node = node->next;
 		}
 		printf("\n");
