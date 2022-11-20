@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/20 00:46:40 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/20 21:14:33 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ void		operator_parser(t_command *list);
 char		*trim_whitespace(char *str);
 void		trim_whitespace_parser(t_command *list);
 void		split_and_or(t_command *current);
-char		**split_on_spaces(char *str);
+char		**split_on_spaces(t_token *tok);
 void		free_char_array(char **array);
 char		**add_to_array(char **array, char **new);
 void 		put_node_token_on_argv(t_command *list);
@@ -173,5 +173,6 @@ void 		split_on_parenthesis(t_command *current);
 void 		split_on_operators(t_command *list);
 void 		remove_empty_nodes(t_command *list);
 void 		print_shit(t_command *list);
+void		print_argv(t_command *list);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/20 00:43:54 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/20 22:10:02 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,10 +91,9 @@ void	parser(char *input)
 	operator_parser(list);
 	trim_whitespace_parser(list);
 	remove_empty_nodes(list);
-	print_shit(list);
 	split_on_operators(list);
-	print_shit(list);
-	
+	put_node_token_on_argv(list);
+	print_argv(list);
 }
 
 void	file_exists(t_command *cmd, int bg)
@@ -204,3 +203,4 @@ int	main(int argc, char **argv, char **envp)
 		}
 	}
 }
+
