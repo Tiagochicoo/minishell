@@ -1,36 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_isalnum.c                                       :+:      :+:    :+:   */
+/*   ft_strncpy.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/17 19:34:35 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/28 18:45:19 by tpereira         ###   ########.fr       */
+/*   Created: 2022/10/23 17:27:22 by tpereira          #+#    #+#             */
+/*   Updated: 2022/10/26 21:22:18 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int	ft_isalnum(int c)
+char	*ft_strncpy(char *dest, const char *src, unsigned int size)
 {
-	if (ft_isalpha(c) || ft_isdigit(c))
-		return (1);
-	return (0);
-}
-
-int	ft_str_isalnum(char *str)
-{
-	int		i;
-	char	*c;
+	unsigned int	i;
 
 	i = 0;
-	while (str[i])
+	while (src[i] != '\0' && i < size)
 	{
-		if (ft_isalnum(str[i]))
-			i++;
-		else
-			return (0);
+		dest[i] = src[i];
+		++i;
 	}
-	return (1);
+	while (i < size)
+	{
+		dest[i] = '\0';
+		i++;
+	}
+	return (dest);
 }

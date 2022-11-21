@@ -3,14 +3,34 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/27 08:59:57 by tpereira          #+#    #+#             */
-/*   Updated: 2021/09/20 18:06:26 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/10 22:11:13 by mimarque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+
+/*
+		by mimarques
+*/
+
+char	**ft_delete_split_arr(char **arr)
+{
+	int	i;
+
+	i = 0;
+	while (arr[i])
+	{
+		free(arr[i]);
+		arr[i] = NULL;
+		i++;
+	}
+	free(arr);
+	arr = NULL;
+	return (NULL);
+}
 
 static long long	word_count(char *str, char charset)
 {
@@ -44,8 +64,9 @@ char	**ft_split(char const *str, char charset)
 	long long	i;
 	char		*from;
 
-	str_arr = (char **)malloc(sizeof(char *)
-			* word_count((char *)str, charset) + 1);
+	if (!ft_strchr(str, (unsigned int)charset))
+		return (NULL);
+	str_arr = (char **)ft_calloc(word_count((char *)str, charset) + 1, sizeof(char *));
 	if (!str || !(str_arr))
 		return (NULL);
 	i = 0;

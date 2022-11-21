@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/08 23:02:16 by tpereira          #+#    #+#             */
-/*   Updated: 2022/09/28 21:41:58 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/10/26 21:27:36 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ int				ft_isnumber(char *str);
 int				ft_isalpha(int c);
 int				ft_isdigit(int c);
 int				ft_isalnum(int c);
+int				ft_str_isalnum(char *str);
 int				ft_isascii(int c);
 int				ft_isprint(int c);
 int				ft_toupper(int c);
@@ -54,6 +55,7 @@ char			*ft_strsub(char const *s, size_t start, size_t len);
 char			*ft_strjoin(char const *s1, char const *s2);
 char			*ft_strtrim(char const *s1, char const *set);
 char			**ft_split(char const *str, char charset);
+char			**ft_delete_split_arr(char **arr);
 char			*ft_itoa(int n);
 char			*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 void			ft_putchar_fd(char c, int fd);
@@ -82,6 +84,7 @@ t_list			*ft_lstmap(t_list *lst, void *(*f)(void *),
 void			ft_addnfix(char **str, char fix_char, int len, int side);
 char			*ft_strnew(size_t size);
 char			*ft_strndup(const char *str, size_t n);
+char			*ft_strncpy(char *dest, const char *src, unsigned int size);
 int				ft_putwstr(wchar_t *ws);
 int				ft_countletter(char *str, char c);
 int				ft_count(char **str);
@@ -94,5 +97,7 @@ char			*ft_itoabase(long num, int base);
 char			*ft_strrev(char *str);
 int				get_next_line(int fd, char **line);
 long long		ft_word_count(char *str, char charset);
+int				ft_strspn(const char *s, const char *accept);
+int				ft_strcspn(const char *s, const char *reject);
 
 #endif
