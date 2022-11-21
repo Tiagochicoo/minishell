@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/20 22:07:45 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/21 17:30:38 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -904,7 +904,6 @@ char *get_command_type(t_command *token)
 		return ("<<");
 	return ("");
 }
-
 
 void print_shit(t_command *list)
 {

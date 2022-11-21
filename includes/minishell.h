@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/20 21:14:33 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/21 17:23:52 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ typedef struct s_command
 	t_list		*args;				// linked list 
 	int			tok_type;
 	char		**envp;				// environment variables
-	void		*input;				
+	void		*input;
 	void		*output;
 	// operator type enum
 	t_builtin	cmd_type;			// builtin type enum

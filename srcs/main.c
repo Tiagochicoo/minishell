@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/20 22:10:02 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/21 17:43:35 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,25 +96,25 @@ void	parser(char *input)
 	print_argv(list);
 }
 
-void	file_exists(t_command *cmd, int bg)
+void	file_exists(t_command *cmd)
 {
 	char	*tmp;
 
 	tmp = ft_find_cmd(cmd);
 	if (tmp != NULL)
-		run_sys_cmd(cmd, tmp, bg);
+		run_sys_cmd(cmd, tmp);
 	else if (!access(cmd->argv[0], F_OK))
 	{
 		if (!access(cmd->argv[0], X_OK))
 		{
-			run_sys_cmd(cmd, cmd->argv[0], bg);
+			run_sys_cmd(cmd, cmd->argv[0]);
 		}
 		else
 			perror("Error");
 	}
 }
 
-void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
+void	run_sys_cmd(t_command *cmd, char *cmd_argv0)
 {
 	pid_t childPid;
 	char	*path;
@@ -132,12 +132,7 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 		free(path);
 	}
 	else	// I'm the parent. Shell continues here.
-	{
-		 if (bg)
-			printf("Child in background [%d]\n",childPid);
-		 else
-			wait(&childPid);
-	}
+		wait(&childPid);
 }
 
 //change this to be the first argv
@@ -163,14 +158,11 @@ void run_builtin_cmd(t_command *cmd)
 
 void eval(char *input, char **envp) 
 {
-	int			background;					// should job run in background?
 	t_command	cmd;						// parsed command
 
-	background = 0;					// parse the input command into command struct
 	parser(input);		
 	cmd.envp = envp;						// set envp
-	if (background == -1)					// parse error
-		return ;
+	
 	if (cmd.argv[0] == NULL)				// empty line - ignore
 		return ;
 	if (cmd.cmd_type == NONE)
