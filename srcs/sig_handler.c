@@ -3,17 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   sig_handler.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-<<<<<<< HEAD
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/10/03 16:49:40 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/22 13:32:50 by mimarque         ###   ########.fr       */
-=======
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/03 16:49:40 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/25 16:03:34 by tpereira         ###   ########.fr       */
->>>>>>> mitest
+/*   Updated: 2022/11/21 17:53:38 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +22,6 @@ void setting_signal()
 //Não entendo as ultimas 3 linhas
 void handler(int signal)
 {
-<<<<<<< HEAD
 	if (signal != SIGINT)
 		return;
 	printf("\n");
@@ -40,7 +32,6 @@ void handler(int signal)
 	rl_replace_line("", 1);
 	//Change what's displayed on the screen to reflect the current contents of rl_line_buffer.
 	rl_redisplay();
-=======
 	pid_t	pid;
 	int		status;
 	char	*cwd;
@@ -61,5 +52,4 @@ void handler(int signal)
 	}
 	if (signal == SIGQUIT)
 		write(1, "\n", 1);
->>>>>>> mitest
 }

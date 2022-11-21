@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/21 17:50:58 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/21 17:53:52 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,7 +166,7 @@ void eval(char *input, char **envp)
 	if (cmd.argv[0] == NULL)				// empty line - ignore
 		return ;
 	if (cmd.cmd_type == NONE)
-		file_exists(&cmd, background);
+		file_exists(&cmd);
 	else
 		run_builtin_cmd(&cmd);
 }
