@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/20 00:46:40 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/21 18:56:15 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ char	*ft_relative_path(char *cwd);
 char	*ft_find_cmd(t_command *cmd);
 
 // EXECUTOR
-void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg);
+void	run_sys_cmd(t_command *cmd, char *cmd_argv0);
 
 void	ft_ft(void);
 

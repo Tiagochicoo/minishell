@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/20 00:43:54 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/21 20:01:23 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,43 +42,7 @@ void error(char *msg)
 	exit(0);
 }
 
-int parse(const char *input, t_command *cmd) 
-{
-	static char	array[MAXLINE];					// local copy of command line
-	const char	delims[10] = " \t\r\n";			// argument delimiters
-	char		*line;							// ptr that traverses command line
-	char		*token;							// ptr to the end of the current arg
-	char		*endline;						// ptr to the end of the input string
-	int			is_bg;							// background job?
-
-	line = array;
-	if (input == NULL)
-		error("command line is NULL\n");
-	(void) ft_strncpy(line, input, MAXLINE);
-	endline = line + ft_strlen(line);
-	cmd->argc = 0;								// build argv list
-	while (line < endline) 
-	{
-		line += ft_strspn(line, delims);		// skip delimiters
-		if (line >= endline)
-			break;
-		token = line + ft_strspn(line, delims);	// Find token delimiter
-		*token = '\0';							// terminate the token
-		cmd->argv[cmd->argc++] = line;			// Record token as the token argument
-		if (cmd->argc >= MAXARGS-1) 			// Check if argv is full
-			break;
-		line = token + 1;
-	}
-	cmd->argv[cmd->argc] = NULL;							// argument list must end with a NULL pointer
-	if (cmd->argc == 0)										// ignore blank line
-		return 1;
-	cmd->cmd_type = parseBuiltin(cmd);
-	if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?
-		cmd->argv[--cmd->argc] = NULL;
-	return is_bg;
-}
-
-void	parser(char *input)
+t_command	*parser(char *input)
 {
 	t_list		*lst;
 	t_command	*list;
@@ -95,27 +59,28 @@ void	parser(char *input)
 	split_on_operators(list);
 	print_shit(list);
 	
+	return(list);
 }
 
-void	file_exists(t_command *cmd, int bg)
+void	file_exists(t_command *cmd)
 {
 	char	*tmp;
 
 	tmp = ft_find_cmd(cmd);
 	if (tmp != NULL)
-		run_sys_cmd(cmd, tmp, bg);
+		run_sys_cmd(cmd, tmp);
 	else if (!access(cmd->argv[0], F_OK))
 	{
 		if (!access(cmd->argv[0], X_OK))
 		{
-			run_sys_cmd(cmd, cmd->argv[0], bg);
+			run_sys_cmd(cmd, cmd->argv[0]);
 		}
 		else
 			perror("Error");
 	}
 }
 
-void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
+void	run_sys_cmd(t_command *cmd, char *cmd_argv0)
 {
 	pid_t childPid;
 	char	*path;
@@ -134,10 +99,7 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 	}
 	else	// I'm the parent. Shell continues here.
 	{
-		 if (bg)
-			printf("Child in background [%d]\n",childPid);
-		 else
-			wait(&childPid);
+		wait(&childPid);
 	}
 }
 
@@ -164,20 +126,21 @@ void run_builtin_cmd(t_command *cmd)
 
 void eval(char *input, char **envp) 
 {
-	int			background;					// should job run in background?
-	t_command	cmd;						// parsed command
+	t_command	*cmds;						// parsed command
 
-	background = 0;					// parse the input command into command struct
-	parser(input);		
-	cmd.envp = envp;						// set envp
-	if (background == -1)					// parse error
-		return ;
-	if (cmd.argv[0] == NULL)				// empty line - ignore
-		return ;
-	if (cmd.cmd_type == NONE)
-		file_exists(&cmd, background);
-	else
-		run_builtin_cmd(&cmd);
+	cmds = parser(input);
+	while (cmds->next)
+	{
+		cmds->cmd_type = parseBuiltin(cmds);
+		cmds->envp = envp;						// set envp
+		if (cmds->argv == NULL)				// empty line - ignore
+			return ;
+		if (cmds->cmd_type == NONE)
+			file_exists(cmds);
+		else
+			run_builtin_cmd(cmds);
+		cmds = cmds->next;
+	}	
 }
 
 int	main(int argc, char **argv, char **envp) 
