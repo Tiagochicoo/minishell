@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/21 18:56:15 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/22 17:30:00 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ void		operator_parser(t_command *list);
 char		*trim_whitespace(char *str);
 void		trim_whitespace_parser(t_command *list);
 void		split_and_or(t_command *current);
-char		**split_on_spaces(char *str);
+char		**split_on_spaces(t_token *tok);
 void		free_char_array(char **array);
 char		**add_to_array(char **array, char **new);
 void 		put_node_token_on_argv(t_command *list);
