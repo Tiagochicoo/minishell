@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/22 17:18:58 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/22 18:49:51 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -934,16 +934,18 @@ void print_shit(t_command *list)
 void	print_argv(t_command *list)
 {
 	int i;
+	int	j;
 
 	i = 0;
+	j = 0;
 	while (list)
 	{
 		printf("node %d: ", i);
 		i++;
-		while (list->argv && *list->argv)
+		while (list->argv && list->argv[j])
 		{
-			printf("%s-", *list->argv);
-			list->argv++;
+			printf("%s-", list->argv[j]);
+			j++;
 		}
 		printf("\n");
 		list = list->next;

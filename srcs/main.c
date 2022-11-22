@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/22 17:42:41 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/22 18:26:46 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,20 +124,16 @@ void run_builtin_cmd(t_command *cmd)
 
 void eval(char *input, char **envp) 
 {
-	int			background;					// should job run in background?
-	t_command	cmd;						// parsed command
+	t_command	*cmd;						// parsed command
 
-	background = 0;					// parse the input command into command struct
-	parser(input);		
-	cmd.envp = envp;						// set envp
-	if (background == -1)					// parse error
+	cmd = parser(input);		
+	cmd->envp = envp;						// set envp
+	if (cmd->argv[0] == NULL)				// empty line - ignore
 		return ;
-	if (cmd.argv[0] == NULL)				// empty line - ignore
-		return ;
-	if (cmd.cmd_type == NONE)
-		file_exists(&cmd);
+	if (cmd->cmd_type == NONE)
+		file_exists(cmd);
 	else
-		run_builtin_cmd(&cmd);
+		run_builtin_cmd(cmd);
 }
 
 int	main(int argc, char **argv, char **envp) 
