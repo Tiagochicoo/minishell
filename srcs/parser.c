@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mimarque <mimarque@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 17:04:10 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/20 01:04:20 by mimarque         ###   ########.fr       */
+/*   Updated: 2022/11/22 17:18:58 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,7 +295,6 @@ void	column_parser_cmds(t_list **lst, t_list *i, t_command **dll)
 	ft_delete_split_arr(split);
 }
 
-//check what it does with just quotes
 t_command	*column_parser(t_list **lst)
 {
 	t_list		*i;
@@ -307,7 +306,6 @@ t_command	*column_parser(t_list **lst)
 	while (i)
 	{
 		tmp = ((t_token *)i->content);
-		printf("%d : %s\n", tmp->tok_type, tmp->token);
 		if (tmp->tok_type == TEXT && ft_strpbrk(tmp->token, ";")
 			&& !is_lastchar(tmp->token, ';'))
 		{
@@ -328,6 +326,12 @@ t_command	*column_parser(t_list **lst)
 		dll_add_back(&dll, dll_new(*lst));
 	return (dll);
 }
+
+//separate the list into t_command lists based on the ';' token
+//only if there is something after the ';' token to avoid segfaults
+
+
+
 
 char	*find_operator(char *str)
 {
@@ -482,11 +486,18 @@ char	*trim_whitespace(char *str)
 	len = ft_strsize(str);
 	while (str[i] == ' ' || str[i] == '\t')
 		i++;
+	//check if string is only whitespace
+	if (i == len)
+		return (NULL);
 	while (str[len - 1] == ' ' || str[len - 1] == '\t')
 		len--;
-	new = malloc(sizeof(char) * (len - i + 1));
+	new = ft_calloc((len - i + 1), (sizeof(char)));
 	while (i < len)
-		new[j++] = str[i++];
+	{
+		new[j] = str[i];
+		i++;
+		j++;
+	}
 	new[j] = '\0';
 	return (new);
 }
@@ -541,32 +552,51 @@ void split_and_or(t_command *current)
 	}
 }
 
-//split string on spaces into other strings
-//if the string is in quotes, don't split on spaces
-char	**split_on_spaces(char *str)
+//is whitespace?
+bool	is_space(char c)
 {
-	int		i;
-	int		j;
-	int		k;
+	if (c == ' ' || c == '\t')
+		return (true);
+	return (false);
+}
+
+//split string on spaces into other strings
+//if the tok_type is in quotes, don't split on spaces
+//using calloc to make sure the string doesn't have garbage in it
+//using QUOTES bit mask to check if the token is in quotes
+//skip all whitespace in order to avoid adding empty strings to the t_list
+char	**split_on_spaces(t_token *tok)
+{
+	int		i; //index for the string
+	int		j; //index for the array
+	int		k; //index for the word
 	char	**new;
 
 	i = 0;
 	j = 0;
 	k = 0;
-	new = ft_calloc(sizeof(char *), ft_strsize(str) + 1); 
-	while (str[i])
+	new = ft_calloc(sizeof(char *), (ft_strsize(tok->token) + 1));
+	while (tok->token[i])
 	{
-		if (str[i] == ' ' || str[i] == '\t')
+		if (is_space(tok->token[i]) && !(tok->tok_type & QUOTE))
 		{
-			new[j] = ft_strndup(str + k, i - k);
+			new[j] = calloc(sizeof(char), (i - k + 1));
+			ft_strlcpy(new[j], tok->token + k, (i - k + 1));
 			j++;
-			k = i + 1;
+			//make sure to skip all whitespace
+			while (is_space(tok->token[i]))
+				i++;
+			k = i;
 		}
 		i++;
 	}
-	new[j] = ft_strndup(str + k, i - k);
+	new[j] = calloc(sizeof(char), (i - k + 1));
+	ft_strlcpy(new[j], tok->token + k, (i - k + 1));
+	new[j + 1] = NULL;
 	return (new);
 }
+
+
 
 //free the char **array
 void	free_char_array(char **array)
@@ -574,6 +604,9 @@ void	free_char_array(char **array)
 	int	i;
 
 	i = 0;
+	//if array is null, return
+	if (!array)
+		return ;
 	while (array[i])
 	{
 		free(array[i]);
@@ -582,41 +615,94 @@ void	free_char_array(char **array)
 	free(array);
 }
 
+//get the size of an array of pointers that is null terminated
+//make sure arguement is not null
+int	char_array_size(char **array)
+{
+	int	i;
+
+	i = 0;
+	//if array is null, return
+	if (!array)
+		return (0);
+	while (array[i])
+		i++;
+	return (i);
+}
+
+char	**strdup_array(char **array)
+{
+	int		i;
+	char	**new;
+
+	i = 0;
+	new = ft_calloc(sizeof(char *), char_array_size(array) + 1);
+	while (array[i])
+	{
+		new[i] = ft_strdup(array[i]);
+		i++;
+	}
+	return (new);
+}
+
 //get the current string array and add the new string array to it
+//notice that new is freed so as array
+//make sure array or new is not null
 char	**add_to_array(char **array, char **new)
 {
 	int		i;
 	int		j;
-	char	**new_array;
+	char	**temp;
 
 	i = 0;
 	j = 0;
-	while (array[i])
-		i++;
-	while (new[j])
-		j++;
-	new_array = ft_calloc(sizeof(char *), i + j + 1);
-	i = 0;
-	j = 0;
+	//if array is null
+	if (!array)
+		return (strdup_array(new));
+	temp = ft_calloc(sizeof(char *), char_array_size(array) + char_array_size(new) + 1);
 	while (array[i])
 	{
-		new_array[i] = array[i];
+		temp[i] = ft_strdup(array[i]);
 		i++;
 	}
 	while (new[j])
 	{
-		new_array[i] = new[j];
+		temp[i] = ft_strdup(new[j]);
 		i++;
 		j++;
 	}
-	return (new_array);
+	free_char_array(array);
+	free_char_array(new);
+	return (temp);
 }
+
+//print array of strings separated by dashes
+void	print_array(char **array)
+{
+	int	i;
+
+	i = 0;
+	//if array is null print null
+	if (!array)
+	{
+		printf("(NULL)\n");
+		return ;
+	}
+	while (array[i])
+	{
+		printf("%s-", array[i]);
+		i++;
+	}
+	printf("\n");
+}
+
 
 //for each t_command node go trough each t_list node (args) 
 //tokenize the content of node->token on space and put them by order on argv
 void put_node_token_on_argv(t_command *list)
 {
 	char	**temp;
+	char	**temp2;
 	t_list 	*lst;
 
 	while (list)
@@ -628,9 +714,8 @@ void put_node_token_on_argv(t_command *list)
 			//hold the current argv to free it later
 			temp = list->argv;
 			//spit the lst->token string on space and add them to argv
-			list->argv = add_to_array(list->argv, split_on_spaces(((t_token *)lst->content)->token));
-			//free the old argv
-			free_char_array(temp);
+			temp2 = split_on_spaces(((t_token *)lst->content));
+			list->argv = add_to_array(temp, temp2);
 			lst = lst->next;
 		}
 		list = list->next;
@@ -841,6 +926,26 @@ void print_shit(t_command *list)
 		}
 		printf("\n");
 		n++;
+		list = list->next;
+	}
+}
+
+//for each t_command node, print its argv
+void	print_argv(t_command *list)
+{
+	int i;
+
+	i = 0;
+	while (list)
+	{
+		printf("node %d: ", i);
+		i++;
+		while (list->argv && *list->argv)
+		{
+			printf("%s-", *list->argv);
+			list->argv++;
+		}
+		printf("\n");
 		list = list->next;
 	}
 }
