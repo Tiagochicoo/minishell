@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/22 17:30:10 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/22 17:42:41 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,43 +42,7 @@ void error(char *msg)
 	exit(0);
 }
 
-int parse(const char *input, t_command *cmd) 
-{
-	static char	array[MAXLINE];					// local copy of command line
-	const char	delims[10] = " \t\r\n";			// argument delimiters
-	char		*line;							// ptr that traverses command line
-	char		*token;							// ptr to the end of the current arg
-	char		*endline;						// ptr to the end of the input string
-	int			is_bg;							// background job?
-
-	line = array;
-	if (input == NULL)
-		error("command line is NULL\n");
-	(void) ft_strncpy(line, input, MAXLINE);
-	endline = line + ft_strlen(line);
-	cmd->argc = 0;								// build argv list
-	while (line < endline) 
-	{
-		line += ft_strspn(line, delims);		// skip delimiters
-		if (line >= endline)
-			break;
-		token = line + ft_strspn(line, delims);	// Find token delimiter
-		*token = '\0';							// terminate the token
-		cmd->argv[cmd->argc++] = line;			// Record token as the token argument
-		if (cmd->argc >= MAXARGS-1) 			// Check if argv is full
-			break;
-		line = token + 1;
-	}
-	cmd->argv[cmd->argc] = NULL;							// argument list must end with a NULL pointer
-	if (cmd->argc == 0)										// ignore blank line
-		return 1;
-	cmd->cmd_type = parseBuiltin(cmd);
-	if ((is_bg = (*cmd->argv[cmd->argc-1] == '&')) != 0)	// should job run in background?
-		cmd->argv[--cmd->argc] = NULL;
-	return is_bg;
-}
-
-void	parser(char *input)
+t_command	*parser(char *input)
 {
 	t_list		*lst;
 	t_command	*list;
@@ -94,6 +58,8 @@ void	parser(char *input)
 	split_on_operators(list);
 	put_node_token_on_argv(list);
 	print_argv(list);
+
+	return (list);
 }
 
 void	file_exists(t_command *cmd)
