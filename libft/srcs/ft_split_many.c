@@ -5,12 +5,13 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/23 17:07:37 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/23 17:08:01 by tpereira         ###   ########.fr       */
+/*   Created: 2021/02/27 08:59:57 by tpereira          #+#    #+#             */
+/*   Updated: 2022/11/23 17:42:52 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include "../includes/libft.h"
 
 char	finish(char buffer[], int count[], char **str_arr)
 {
@@ -52,7 +53,7 @@ void	str_alloc(const char *str, char *charset, int i, char **str_arr)
 	}
 }
 
-char	**ft_split_many(char const *str, char *charset)
+char	**ft_split_many(char *str, char *charset)
 {
 	int		len;
 	int		count;

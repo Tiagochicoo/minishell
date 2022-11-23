@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/23 17:12:59 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/23 18:31:38 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,8 @@ typedef struct s_command
 	char		*argv[MAXARGS];		// arguments list
 	char		**envp;				// environment variables
 	t_builtin	builtin;			// is argv[0] a builtin command?
+	void		*next;				// next command in pipeline
+	void		*head;				// head of the pipeline
 }			t_command;
 
 // typedef struct s_token

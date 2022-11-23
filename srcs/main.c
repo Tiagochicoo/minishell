@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/23 17:22:35 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/23 18:38:57 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ int parse(const char *input, t_command *cmd)
 	int			is_bg;							// background job?
 
 	line = array;
+	printf("(parser)input: %s\n", input);
 	if (input == NULL)
 		error("command line is NULL\n");
 	(void) ft_strncpy(line, input, MAXLINE);
@@ -143,26 +144,60 @@ void run_builtin_cmd(t_command *cmd)
 		ft_ft();
 }
 
+void ft_add_cmd(t_command **cmd_list, t_command *cmd)
+{
+	t_command *tmp;
+
+	tmp = *cmd_list;
+	if (tmp == NULL)
+		*cmd_list = cmd;
+	else
+	{
+		while (tmp->next != NULL)
+			tmp = tmp->next;
+		tmp->next = cmd;
+	}
+}
+
+void ft_str2cmd(char *str, t_command **cmd_list)
+{
+	t_command *cmd;
+	int		bg;
+
+	cmd = (t_command *)malloc(sizeof(t_command));
+	if (cmd == NULL)
+		error("malloc() error");
+	bg = parse(str, cmd);
+	if (cmd->builtin == NONE)
+		file_exists(cmd, bg);
+	else
+		run_builtin_cmd(cmd);
+	ft_add_cmd(cmd_list, cmd);
+}
+
 void eval(char *input, char **envp) 
 {
-	int			background;					// should job run in background?
-	t_command	**cmd;						// parsed commands
-	char		**cmds;						// array of commands coming from input
+	int			background;								// should job run in background?
+	t_command	*cmd;									// parsed commands
+	char		**cmds;									// array of commands coming from input
 	int			i;
 
 	i = 0;
-	cmds = ft_split_many(input, "|<>()\"\'");		// split input into commands
-	cmd = (t_command **)malloc(sizeof(t_command *));
-	while (*cmds && i)
+	cmds = ft_split_many(input, "|<>()");				// split input into commands
+	cmd = NULL;
+	printf("input: %s\n", input);
+	while (cmds[i])
 	{
-		cmd[i] = (t_command *)malloc(sizeof(t_command));
-		background = parse(*cmds, *cmd);	// parse command line into cmd struct
-		cmd[i]->envp = envp;
-		if (cmd[i]->builtin != NONE)
-			run_builtin_cmd(cmd[i]);
+		printf("cmd[%d]: %s\n", i, cmds[i]);
+		ft_str2cmd(cmds[i], &cmd);						// convert string to command
+		ft_add_cmd(&cmd, cmd);							// add command to the list
+		background = parse(cmds[i], cmd);					// parse command line into cmd struct
+		cmd->envp = envp;
+		if (cmd->builtin != NONE)
+			run_builtin_cmd(cmd);
 		else
-			file_exists(cmd[i], background);
-		cmds++;
+			file_exists(cmd, background);
+		cmd = cmd->next;
 		i++;
 	}
 }
