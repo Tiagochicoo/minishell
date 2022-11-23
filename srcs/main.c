@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/28 18:56:36 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/23 17:22:35 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,18 +146,25 @@ void run_builtin_cmd(t_command *cmd)
 void eval(char *input, char **envp) 
 {
 	int			background;					// should job run in background?
-	t_command	cmd;						// parsed command
+	t_command	**cmd;						// parsed commands
+	char		**cmds;						// array of commands coming from input
+	int			i;
 
-	background = parse(input, &cmd);	 	// parse line into command struct
-	cmd.envp = envp;						// set envp
-	if (background == -1)					// parse error
-		return;
-	if (cmd.argv[0] == NULL)				// empty line - ignore
-		return;
-	if (cmd.builtin == NONE)
-		file_exists(&cmd, background);
-	else
-		run_builtin_cmd(&cmd);
+	i = 0;
+	cmds = ft_split_many(input, "|<>()\"\'");		// split input into commands
+	cmd = (t_command **)malloc(sizeof(t_command *));
+	while (*cmds && i)
+	{
+		cmd[i] = (t_command *)malloc(sizeof(t_command));
+		background = parse(*cmds, *cmd);	// parse command line into cmd struct
+		cmd[i]->envp = envp;
+		if (cmd[i]->builtin != NONE)
+			run_builtin_cmd(cmd[i]);
+		else
+			file_exists(cmd[i], background);
+		cmds++;
+		i++;
+	}
 }
 
 int	main(int argc, char **argv, char **envp) 
