@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/23 18:38:57 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/23 22:16:25 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,14 +43,13 @@ void error(char *msg)
 int parse(const char *input, t_command *cmd) 
 {
 	static char	array[MAXLINE];					// local copy of command line
-	const char	delims[10] = " \t\r\n";			// argument delimiters
+	const char	delims[10] = " \t\r\n\"\'";		// argument delimiters
 	char		*line;							// ptr that traverses command line
 	char		*token;							// ptr to the end of the current arg
 	char		*endline;						// ptr to the end of the input string
 	int			is_bg;							// background job?
 
 	line = array;
-	printf("(parser)input: %s\n", input);
 	if (input == NULL)
 		error("command line is NULL\n");
 	(void) ft_strncpy(line, input, MAXLINE);
@@ -149,7 +148,7 @@ void ft_add_cmd(t_command **cmd_list, t_command *cmd)
 	t_command *tmp;
 
 	tmp = *cmd_list;
-	if (tmp == NULL)
+	if (tmp->argv == NULL)
 		*cmd_list = cmd;
 	else
 	{
@@ -162,35 +161,36 @@ void ft_add_cmd(t_command **cmd_list, t_command *cmd)
 void ft_str2cmd(char *str, t_command **cmd_list)
 {
 	t_command *cmd;
-	int		bg;
 
 	cmd = (t_command *)malloc(sizeof(t_command));
 	if (cmd == NULL)
 		error("malloc() error");
-	bg = parse(str, cmd);
-	if (cmd->builtin == NONE)
-		file_exists(cmd, bg);
-	else
-		run_builtin_cmd(cmd);
+	cmd->argc = ft_word_count(str, ' ');
+	cmd->next = NULL;
+	cmd->argv = ft_split(str, ' ');
+	cmd->builtin = parseBuiltin(cmd);
+	cmd->envp = NULL;
+	cmd->head = *cmd_list;
 	ft_add_cmd(cmd_list, cmd);
 }
 
 void eval(char *input, char **envp) 
 {
-	int			background;								// should job run in background?
-	t_command	*cmd;									// parsed commands
-	char		**cmds;									// array of commands coming from input
+	int			background;									// should job run in background?
+	t_command	*cmd;										// parsed commands
+	char		**cmds;										// array of commands coming from input
 	int			i;
 
 	i = 0;
-	cmds = ft_split_many(input, "|<>()");				// split input into commands
-	cmd = NULL;
-	printf("input: %s\n", input);
+	cmds = ft_split_many(input, "|<>()");					// split input into commands
+	while(cmds[i])
+		i++;
+	cmd = (t_command *)malloc(sizeof(t_command) * i);
+	i = 0;
 	while (cmds[i])
 	{
-		printf("cmd[%d]: %s\n", i, cmds[i]);
-		ft_str2cmd(cmds[i], &cmd);						// convert string to command
-		ft_add_cmd(&cmd, cmd);							// add command to the list
+		ft_str2cmd(cmds[i], &cmd);							// convert string to command
+		ft_add_cmd(&cmd, cmd);								// add command to the list
 		background = parse(cmds[i], cmd);					// parse command line into cmd struct
 		cmd->envp = envp;
 		if (cmd->builtin != NONE)
@@ -204,10 +204,10 @@ void eval(char *input, char **envp)
 
 int	main(int argc, char **argv, char **envp) 
 {
-	char	*input;							// buffer for readline
+	char	*input;										// buffer for readline
 	char	*cwd;
 
-	signal(SIGINT, handler);
+	setting_signal();
 	if (argv[0] != NULL)
 	{
 		while (argc)
@@ -222,6 +222,8 @@ int	main(int argc, char **argv, char **envp)
 			}
 			else if (ft_strcmp(input, "\n") > 0)
 				add_history(input);
+			else if (feof(stdin))
+				exit (0);
 			eval(input, envp);				// Evaluate input
 		}
 	}

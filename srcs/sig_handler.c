@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/03 16:49:40 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/25 16:03:34 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/23 22:11:32 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ void handler(int signal)
 		if (pid == -1)
 		{
 			cwd = ft_relative_path(getcwd(NULL, 0));
-			printf("%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
-			rl_replace_line("\n", 0);
+			printf("\n%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
+			rl_replace_line("", 0);
 			rl_on_new_line();
 			rl_redisplay();
 		}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/11/23 18:31:38 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/11/23 21:08:50 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,12 @@ typedef enum s_builtin
 
 typedef struct s_command 
 {
-	int			argc;				// number of args
-	char		*argv[MAXARGS];		// arguments list
-	char		**envp;				// environment variables
-	t_builtin	builtin;			// is argv[0] a builtin command?
-	void		*next;				// next command in pipeline
-	void		*head;				// head of the pipeline
+	int			argc;						// number of args
+	char		**argv;						// arguments list
+	char		**envp;						// environment variables
+	t_builtin	builtin;					// is argv[0] a builtin command?
+	struct s_command	*next;				// next command in pipeline
+	struct s_command	*head;				// head of the pipeline
 }			t_command;
 
 // typedef struct s_token
