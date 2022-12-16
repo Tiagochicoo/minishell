@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/23 22:16:25 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/12/16 15:34:24 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int parse(const char *input, t_command *cmd)
 		token = line + ft_strcspn(line, delims);// Find token delimiter
 		*token = '\0';							// terminate the token
 		cmd->argv[cmd->argc++] = line;			// Record token as the token argument
-		if (cmd->argc >= MAXARGS-1)				// Check if argv is full
+		if (cmd->argc >= MAXARGS - 1)				// Check if argv is full
 			break;
 		line = token + 1;
 	}
@@ -156,6 +156,7 @@ void ft_add_cmd(t_command **cmd_list, t_command *cmd)
 			tmp = tmp->next;
 		tmp->next = cmd;
 	}
+	cmd->next = NULL;
 }
 
 void ft_str2cmd(char *str, t_command **cmd_list)
@@ -177,27 +178,30 @@ void ft_str2cmd(char *str, t_command **cmd_list)
 void eval(char *input, char **envp) 
 {
 	int			background;									// should job run in background?
-	t_command	*cmd;										// parsed commands
+	t_command	*cmd_list;										// parsed commands
 	char		**cmds;										// array of commands coming from input
 	int			i;
 
 	i = 0;
 	cmds = ft_split_many(input, "|<>()");					// split input into commands
 	while(cmds[i])
+	{
+		printf("%s\n", cmds[i]);
 		i++;
-	cmd = (t_command *)malloc(sizeof(t_command) * i);
+	}
+	cmd_list = (t_command *)malloc(sizeof(t_command) * i);
 	i = 0;
 	while (cmds[i])
 	{
-		ft_str2cmd(cmds[i], &cmd);							// convert string to command
-		ft_add_cmd(&cmd, cmd);								// add command to the list
-		background = parse(cmds[i], cmd);					// parse command line into cmd struct
-		cmd->envp = envp;
-		if (cmd->builtin != NONE)
-			run_builtin_cmd(cmd);
+		ft_str2cmd(cmds[i], &cmd_list);							// convert string to command
+		ft_add_cmd(&cmd_list, cmd_list);							// add command to the cmd_list
+		background = parse(cmds[i], cmd_list);					// parse command line into cmd_list struct
+		cmd_list->envp = envp;
+		if (cmd_list->builtin)
+			run_builtin_cmd(cmd_list);
 		else
-			file_exists(cmd, background);
-		cmd = cmd->next;
+			file_exists(cmd_list, background);
+		cmd_list = cmd_list->next;
 		i++;
 	}
 }
@@ -210,7 +214,7 @@ int	main(int argc, char **argv, char **envp)
 	setting_signal();
 	if (argv[0] != NULL)
 	{
-		while (argc)
+		while (argc > 0)
 		{
 			cwd = ft_relative_path(getcwd(NULL, 0));
 			printf("%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
@@ -227,4 +231,5 @@ int	main(int argc, char **argv, char **envp)
 			eval(input, envp);				// Evaluate input
 		}
 	}
+	return (0);
 }

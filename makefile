@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+         #
+#    By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/22 16:50:02 by tpereira          #+#    #+#              #
-#    Updated: 2022/10/03 22:34:10 by tpereira         ###   ########.fr        #
+#    Updated: 2022/12/16 15:16:03 by tpereira         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ LIB         = libft/libft.a
 
 all :
 	@make -s -C libft
-	@$(CC) $(CFLAGS) $(SRCS) $(LIB) -o $(MINISHELL) -lreadline -L /opt/homebrew/Cellar/readline/8.1.2/lib/ -I /opt/homebrew/Cellar/readline/8.1.2/include
+	@$(CC) $(CFLAGS) $(SRCS) $(LIB) -o $(MINISHELL) -g -lreadline -L /opt/homebrew/Cellar/readline/8.1.2/lib/ -I /opt/homebrew/Cellar/readline/8.1.2/include
 	@printf "\e[38;5;46m ╔════════════════════════════════════╗\e[0m\n"
 	@printf "\e[38;5;46m█▓▒░         Compiled Libft         ░▒▓█ \e[0m\n"
 	@printf "\e[38;5;46m█▓▒░   Minishell build successful   ░▒▓█ \e[0m\n"
