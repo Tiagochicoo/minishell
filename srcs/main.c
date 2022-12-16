@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/12/16 15:34:24 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/12/16 18:25:54 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,13 +143,13 @@ void run_builtin_cmd(t_command *cmd)
 		ft_ft();
 }
 
-void ft_add_cmd(t_command **cmd_list, t_command *cmd)
+void ft_add_cmd(t_command *cmd_list, t_command *cmd)
 {
 	t_command *tmp;
 
-	tmp = *cmd_list;
+	tmp = cmd_list;
 	if (tmp->argv == NULL)
-		*cmd_list = cmd;
+		cmd_list = cmd;
 	else
 	{
 		while (tmp->next != NULL)
@@ -159,20 +159,17 @@ void ft_add_cmd(t_command **cmd_list, t_command *cmd)
 	cmd->next = NULL;
 }
 
-void ft_str2cmd(char *str, t_command **cmd_list)
+void ft_str2cmd(char *str, t_command *cmd_list)
 {
-	t_command *cmd;
+	t_command cmd;
 
-	cmd = (t_command *)malloc(sizeof(t_command));
-	if (cmd == NULL)
-		error("malloc() error");
-	cmd->argc = ft_word_count(str, ' ');
-	cmd->next = NULL;
-	cmd->argv = ft_split(str, ' ');
-	cmd->builtin = parseBuiltin(cmd);
-	cmd->envp = NULL;
-	cmd->head = *cmd_list;
-	ft_add_cmd(cmd_list, cmd);
+	cmd.argc = ft_word_count(str, ' ');
+	cmd.next = NULL;
+	cmd.argv = ft_split(str, ' ');
+	cmd.builtin = parseBuiltin(&cmd);
+	cmd.envp = NULL;
+	cmd.head = cmd_list;
+	ft_add_cmd(cmd_list, &cmd);
 }
 
 void eval(char *input, char **envp) 
@@ -185,16 +182,13 @@ void eval(char *input, char **envp)
 	i = 0;
 	cmds = ft_split_many(input, "|<>()");					// split input into commands
 	while(cmds[i])
-	{
-		printf("%s\n", cmds[i]);
 		i++;
-	}
 	cmd_list = (t_command *)malloc(sizeof(t_command) * i);
 	i = 0;
 	while (cmds[i])
 	{
-		ft_str2cmd(cmds[i], &cmd_list);							// convert string to command
-		ft_add_cmd(&cmd_list, cmd_list);							// add command to the cmd_list
+		ft_str2cmd(cmds[i], cmd_list);							// convert string to command
+		ft_add_cmd(&cmd_list, cmd_list);						// add command to the cmd_list
 		background = parse(cmds[i], cmd_list);					// parse command line into cmd_list struct
 		cmd_list->envp = envp;
 		if (cmd_list->builtin)
@@ -224,7 +218,7 @@ int	main(int argc, char **argv, char **envp)
 				printf("\n");
 				break;
 			}
-			else if (ft_strcmp(input, "\n") > 0)
+			else if (ft_strcmp(input, "\n"))
 				add_history(input);
 			else if (feof(stdin))
 				exit (0);
