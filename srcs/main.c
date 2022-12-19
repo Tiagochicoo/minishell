@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/12/16 18:25:54 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/12/19 15:46:26 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,10 +172,10 @@ void ft_str2cmd(char *str, t_command *cmd_list)
 	ft_add_cmd(cmd_list, &cmd);
 }
 
-void eval(char *input, char **envp) 
+void eval(char *input, char **envp)
 {
 	int			background;									// should job run in background?
-	t_command	*cmd_list;										// parsed commands
+	t_command	cmd_list;									// parsed commands
 	char		**cmds;										// array of commands coming from input
 	int			i;
 
@@ -183,19 +183,18 @@ void eval(char *input, char **envp)
 	cmds = ft_split_many(input, "|<>()");					// split input into commands
 	while(cmds[i])
 		i++;
-	cmd_list = (t_command *)malloc(sizeof(t_command) * i);
 	i = 0;
 	while (cmds[i])
 	{
-		ft_str2cmd(cmds[i], cmd_list);							// convert string to command
-		ft_add_cmd(&cmd_list, cmd_list);						// add command to the cmd_list
-		background = parse(cmds[i], cmd_list);					// parse command line into cmd_list struct
-		cmd_list->envp = envp;
-		if (cmd_list->builtin)
-			run_builtin_cmd(cmd_list);
+		ft_str2cmd(cmds[i], &cmd_list);							// convert string to command
+		//ft_add_cmd(&cmd_list.head, &cmd_list);							// add command to the cmd_list
+		background = parse(cmds[i], &cmd_list);					// parse command line into cmd_list struct
+		cmd_list.envp = envp;
+		if (cmd_list.builtin)
+			run_builtin_cmd(&cmd_list);
 		else
-			file_exists(cmd_list, background);
-		cmd_list = cmd_list->next;
+			file_exists(&cmd_list, background);
+		//*cmd_list = cmd_list->next;
 		i++;
 	}
 }
