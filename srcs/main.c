@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/12/16 18:25:54 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/12/21 11:50:35 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,61 +143,89 @@ void run_builtin_cmd(t_command *cmd)
 		ft_ft();
 }
 
-void ft_add_cmd(t_command *cmd_list, t_command *cmd)
+void ft_add_cmd(t_command *head, t_command *cmd)
 {
-	t_command *tmp;
+	t_command tmp;
 
-	tmp = cmd_list;
-	if (tmp->argv == NULL)
-		cmd_list = cmd;
+	tmp = *head;
+	printf("1test\n");
+	if (tmp.argv == NULL)
+		head = cmd;
 	else
 	{
-		while (tmp->next != NULL)
-			tmp = tmp->next;
-		tmp->next = cmd;
+		while (tmp.next != NULL)
+			tmp = *tmp.next;
+		tmp.next = cmd;
 	}
+	printf("2test\n");
 	cmd->next = NULL;
 }
 
-void ft_str2cmd(char *str, t_command *cmd_list)
+t_command *ft_str2cmd(char *str, t_command *cmd_list)
 {
-	t_command cmd;
+	t_command *cmd;
 
-	cmd.argc = ft_word_count(str, ' ');
-	cmd.next = NULL;
-	cmd.argv = ft_split(str, ' ');
-	cmd.builtin = parseBuiltin(&cmd);
-	cmd.envp = NULL;
-	cmd.head = cmd_list;
-	ft_add_cmd(cmd_list, &cmd);
+	cmd = (t_command *)malloc(sizeof(t_command));
+	if (!cmd)
+		error("Memory allocation error!");
+	cmd->argc = ft_word_count(str, ' ');
+	cmd->argv = ft_split(str, ' ');
+	cmd->builtin = parseBuiltin(cmd);
+	cmd->next = NULL;
+	cmd->envp = cmd_list->envp;
+	if (cmd_list->argv == NULL)
+		cmd_list = cmd;
+	else
+	{
+		cmd->head = cmd_list;
+		while (cmd_list->next != NULL)
+			cmd_list = cmd_list->next;
+		cmd_list->next = cmd;
+	}
+	return (cmd_list);
 }
 
-void eval(char *input, char **envp) 
+void	execute(t_command *cmd_list, int background)
 {
-	int			background;									// should job run in background?
-	t_command	*cmd_list;										// parsed commands
-	char		**cmds;										// array of commands coming from input
-	int			i;
-
-	i = 0;
-	cmds = ft_split_many(input, "|<>()");					// split input into commands
-	while(cmds[i])
-		i++;
-	cmd_list = (t_command *)malloc(sizeof(t_command) * i);
-	i = 0;
-	while (cmds[i])
+	while (cmd_list->next != NULL)
 	{
-		ft_str2cmd(cmds[i], cmd_list);							// convert string to command
-		ft_add_cmd(&cmd_list, cmd_list);						// add command to the cmd_list
-		background = parse(cmds[i], cmd_list);					// parse command line into cmd_list struct
-		cmd_list->envp = envp;
 		if (cmd_list->builtin)
 			run_builtin_cmd(cmd_list);
 		else
 			file_exists(cmd_list, background);
 		cmd_list = cmd_list->next;
+	}
+	if (cmd_list->builtin)
+		run_builtin_cmd(cmd_list);
+	else
+		file_exists(cmd_list, background);
+}
+
+void eval(char *input, char **envp) 
+{
+	int			background;									// should job run in background?
+	t_command	*cmd_list;									// parsed commands linked list
+	char		**cmds;										// array of commands coming from input
+	int			i;
+
+	i = 0;
+	if (!input)
+		return ;
+	cmds = ft_split_many(input, "|<>()"); 					// split input into commands
+	cmd_list = (t_command *)malloc(sizeof(t_command));
+	while (cmds[i])
+		i++;
+	i = 0;
+	while (cmds[i])
+	{
+		cmd_list->envp = envp;
+		cmd_list = ft_str2cmd(cmds[i], cmd_list); 				// convert string to command
+		// ft_add_cmd(cmd_list.head, &cmd_list);				// add command to the cmd_list
+		background = parse(cmds[i], cmd_list);					// parse command line into cmd_list struct
+		printf("token -> %s\n", cmd_list->argv[i]);
 		i++;
 	}
+	execute(cmd_list, background);
 }
 
 int	main(int argc, char **argv, char **envp) 
@@ -222,7 +250,8 @@ int	main(int argc, char **argv, char **envp)
 				add_history(input);
 			else if (feof(stdin))
 				exit (0);
-			eval(input, envp);				// Evaluate input
+			if (*input)
+				eval(input, envp);						// Evaluate input
 		}
 	}
 	return (0);
