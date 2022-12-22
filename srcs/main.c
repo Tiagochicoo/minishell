@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/12/22 09:49:18 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/12/22 10:35:54 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,37 +42,37 @@ void error(char *msg)
 
 int parse(const char *input, t_command *cmd) 
 {
-	static char	array[MAXLINE];					// local copy of command line
-	const char	delims[10] = " \t\r\n\"\'";		// argument delimiters
-	char		*line;							// ptr that traverses command line
-	char		*token;							// ptr to the end of the current arg
-	char		*endline;						// ptr to the end of the input string
-	int			is_bg;							// background job?
+	static char	array[MAXLINE];								// local copy of command line
+	const char	delims[10] = " \t\r\n\"\'";					// argument delimiters
+	char		*line;										// ptr that traverses command line
+	char		*token;										// ptr to the end of the current arg
+	char		*endline;									// ptr to the end of the input string
+	int			is_bg;										// background job?
 
 	line = array;
 	if (input == NULL)
 		error("command line is NULL\n");
 	(void) ft_strncpy(line, input, MAXLINE);
 	endline = line + ft_strlen(line);
-	cmd->argc = 0;								// build argv list
+	cmd->argc = 0;											// build argv list
 	while (line < endline)
 	{
-		line += ft_strspn(line, delims);		// skip delimiters
+		line += ft_strspn(line, delims);					// skip delimiters
 		if (line >= endline)
 			break;
-		token = line + ft_strcspn(line, delims);// Find token delimiter
-		*token = '\0';							// terminate the token
-		cmd->argv[cmd->argc++] = line;			// Record token as the token argument
-		if (cmd->argc >= MAXARGS - 1)				// Check if argv is full
+		token = line + ft_strcspn(line, delims);			// Find token delimiter
+		*token = '\0';										// terminate the token
+		cmd->argv[cmd->argc++] = line;						// Record token as the token argument
+		if (cmd->argc >= MAXARGS - 1)						// Check if argv is full
 			break;
 		line = token + 1;
 	}
-	cmd->argv[cmd->argc] = NULL;				// argument list must end with a NULL pointer
-	if (cmd->argc == 0)							// ignore blank line
+	cmd->argv[cmd->argc] = NULL;							// argument list must end with a NULL pointer
+	if (cmd->argc == 0)										// ignore blank line
 		return 1;
 	cmd->builtin = parseBuiltin(cmd);
 	is_bg = (*cmd->argv[cmd->argc-1] == '&');
-	if (is_bg)									// should job run in background?
+	if (is_bg)												// should job run in background?
 		cmd->argv[--cmd->argc] = NULL;
 	return is_bg;
 }
@@ -99,18 +99,18 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 	char	*path;
 
 	path = cmd_argv0;
-	if ((childPid = fork()) < 0)					// fork a child process	
+	if ((childPid = fork()) < 0)								// fork a child process	
 		error("fork() error");
-	else if (childPid == 0)							// I'm the child and could run a command
+	else if (childPid == 0)										// I'm the child and could run a command
 	{
-		if (execve(path, cmd->argv, cmd->envp) < 0)	// EXECVE != EXECVP
+		if (execve(path, cmd->argv, cmd->envp) < 0)				// EXECVE != EXECVP
 		{
 			printf("%sError: command not found: %s%s\n", RED, RESET, cmd->argv[0]);
 			exit(0);
 		}
 		free(path);
 	}
-	else	// I'm the parent. Shell continues here.
+	else				// I'm the parent. Shell continues here.
 	{
 		 if (bg)
 			printf("Child in background [%d]\n",childPid);
@@ -210,7 +210,7 @@ void eval(char *input, char **envp)
 	i = 0;
 	if (!input)
 		return ;
-	cmds = ft_split_many(input, "|<>()"); 						// split input into commands
+	cmds = ft_split_many(input, "|<>()");						// split input into commands
 	cmd_list = (t_command *)malloc(sizeof(t_command));
 	cmd_list->head = cmd_list;
 	while (cmds[i])
@@ -222,7 +222,6 @@ void eval(char *input, char **envp)
 		cmd_list = ft_str2cmd(cmds[i], cmd_list);				// convert string to command
 		// ft_add_cmd(cmd_list.head, &cmd_list);				// add command to the cmd_list
 		background = parse(cmds[i], cmd_list);					// parse command line into cmd_list struct
-		printf("token -> %s\n", cmd_list->argv[i]);
 		i++;
 	}
 	execute(cmd_list->head, background);

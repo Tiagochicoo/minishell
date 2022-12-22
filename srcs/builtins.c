@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/24 16:39:13 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/26 21:32:10 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/12/22 10:35:05 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,12 @@ void	echo(t_command *cmd)
 	i = 1;
 	while (cmd->argv[i] != NULL && ft_strcmp(cmd->argv[i], "-n") == 0)
 		i++;
+	while (cmd->argv[i] && cmd->argv[i][0] == '$')
+	{
+		if (getenv(&cmd->argv[i][1]))
+			printf("%s ", getenv(&cmd->argv[i][1]));
+		i++;
+	}
 	while (cmd->argv[i])
 		printf("%s ", cmd->argv[i++]);
 	if (cmd->argv[1] == NULL || ft_strcmp(cmd->argv[1], "-n") != 0)
