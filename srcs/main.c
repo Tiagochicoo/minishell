@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/12/22 11:36:37 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/12/22 12:00:04 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,11 +169,11 @@ t_command *ft_str2cmd(char *str, t_command *cmd_list)
 		cmd_list->next = cmd;
 		cmd->envp = cmd_list->envp;
 		cmd->head = cmd_list->head;
-		cmd_list = cmd_list->next;
+		//cmd_list = cmd_list->next;
 	}
 	cmd->argc = ft_word_count(str, ' ');
 	cmd->argv = ft_split(str, ' ');
-	cmd->background = parse(str, cmd_list);
+	cmd->background = parse(str, cmd);
 	if (cmd->argc)
 		cmd->builtin = parseBuiltin(cmd);
 	cmd->next = NULL;
@@ -211,9 +211,9 @@ void eval(char *input, char **envp)
 	cmd_list = (t_command *)malloc(sizeof(t_command));
 	cmd_list->head = cmd_list;
 	cmd_list->envp = envp;
-	while (cmds[i])
-		i++;
-	i = 0;
+	// while (cmds[i])
+	// 	i++;
+	// i = 0;
 	while (cmds[i])
 		cmd_list = ft_str2cmd(cmds[i++], cmd_list);										// convert string to command
 	execute(cmd_list->head);
