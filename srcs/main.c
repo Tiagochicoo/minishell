@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/12/19 15:46:26 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/12/22 09:49:18 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,12 +86,8 @@ void	file_exists(t_command *cmd, int bg)
 		run_sys_cmd(cmd, tmp, bg);
 	else if (!access(cmd->argv[0], F_OK))
 	{
-		printf("File Exists\n");
 		if (!access(cmd->argv[0], X_OK))
-		{
-			printf("Has access\n");
 			run_sys_cmd(cmd, cmd->argv[0], bg);
-		}
 		else
 			perror("Error");
 	}
@@ -143,62 +139,95 @@ void run_builtin_cmd(t_command *cmd)
 		ft_ft();
 }
 
-void ft_add_cmd(t_command *cmd_list, t_command *cmd)
-{
-	t_command *tmp;
+// void ft_add_cmd(t_command *head, t_command *cmd)
+// {
+// 	t_command tmp;
 
-	tmp = cmd_list;
-	if (tmp->argv == NULL)
+// 	tmp = *head;
+// 	if (tmp.argv == NULL)
+// 		head = cmd;
+// 	else
+// 	{
+// 		while (tmp.next != NULL)
+// 			tmp = *tmp.next;
+// 		tmp.next = cmd;
+// 	}
+// 	cmd->next = NULL;
+// }
+
+t_command *ft_str2cmd(char *str, t_command *cmd_list)
+{
+	t_command *cmd;
+
+	cmd = (t_command *)malloc(sizeof(t_command));
+	if (!cmd)
+		error("Memory allocation error!");
+	cmd->argc = ft_word_count(str, ' ');
+	cmd->argv = ft_split(str, ' ');
+	if (cmd->argc)
+		cmd->builtin = parseBuiltin(cmd);
+	cmd->next = NULL;
+	cmd->envp = cmd_list->envp;
+	cmd->head = cmd_list->head;
+	if (cmd_list->argv == NULL)
+	{
 		cmd_list = cmd;
+		cmd_list->head = cmd;
+	}
 	else
 	{
-		while (tmp->next != NULL)
-			tmp = tmp->next;
-		tmp->next = cmd;
+		cmd->head = cmd_list->head;
+		while (cmd_list->next != NULL)
+			cmd_list = cmd_list->next;
+		cmd_list->next = cmd;
 	}
-	cmd->next = NULL;
+	return (cmd_list);
 }
 
-void ft_str2cmd(char *str, t_command *cmd_list)
+void	execute(t_command *cmd_list, int background)
 {
-	t_command cmd;
-
-	cmd.argc = ft_word_count(str, ' ');
-	cmd.next = NULL;
-	cmd.argv = ft_split(str, ' ');
-	cmd.builtin = parseBuiltin(&cmd);
-	cmd.envp = NULL;
-	cmd.head = cmd_list;
-	ft_add_cmd(cmd_list, &cmd);
+	while (cmd_list->next != NULL)
+	{
+		if (cmd_list->builtin)
+			run_builtin_cmd(cmd_list);
+		else
+			file_exists(cmd_list, background);
+		cmd_list = cmd_list->next;
+	}
+	if (cmd_list->builtin)
+		run_builtin_cmd(cmd_list);
+	else if (cmd_list->argv[0])
+		file_exists(cmd_list, background);
 }
 
 void eval(char *input, char **envp)
 {
-	int			background;									// should job run in background?
-	t_command	cmd_list;									// parsed commands
-	char		**cmds;										// array of commands coming from input
+	int			background;										// should job run in background?
+	t_command	*cmd_list;										// parsed commands linked list
+	char		**cmds;											// array of commands coming from input
 	int			i;
 
 	i = 0;
-	cmds = ft_split_many(input, "|<>()");					// split input into commands
-	while(cmds[i])
+	if (!input)
+		return ;
+	cmds = ft_split_many(input, "|<>()"); 						// split input into commands
+	cmd_list = (t_command *)malloc(sizeof(t_command));
+	cmd_list->head = cmd_list;
+	while (cmds[i])
 		i++;
 	i = 0;
 	while (cmds[i])
 	{
-		ft_str2cmd(cmds[i], &cmd_list);							// convert string to command
-		//ft_add_cmd(&cmd_list.head, &cmd_list);							// add command to the cmd_list
-		background = parse(cmds[i], &cmd_list);					// parse command line into cmd_list struct
-		cmd_list.envp = envp;
-		if (cmd_list.builtin)
-			run_builtin_cmd(&cmd_list);
-		else
-			file_exists(&cmd_list, background);
-		//*cmd_list = cmd_list->next;
+		cmd_list->envp = envp;
+		cmd_list = ft_str2cmd(cmds[i], cmd_list);				// convert string to command
+		// ft_add_cmd(cmd_list.head, &cmd_list);				// add command to the cmd_list
+		background = parse(cmds[i], cmd_list);					// parse command line into cmd_list struct
+		printf("token -> %s\n", cmd_list->argv[i]);
 		i++;
 	}
+	execute(cmd_list->head, background);
 }
-
+					
 int	main(int argc, char **argv, char **envp) 
 {
 	char	*input;										// buffer for readline
@@ -221,7 +250,8 @@ int	main(int argc, char **argv, char **envp)
 				add_history(input);
 			else if (feof(stdin))
 				exit (0);
-			eval(input, envp);				// Evaluate input
+			if (*input)
+				eval(input, envp);						// Evaluate input
 		}
 	}
 	return (0);
