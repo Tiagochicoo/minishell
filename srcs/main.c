@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/12/22 10:35:54 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/12/22 11:36:37 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,50 +159,47 @@ t_command *ft_str2cmd(char *str, t_command *cmd_list)
 {
 	t_command *cmd;
 
-	cmd = (t_command *)malloc(sizeof(t_command));
-	if (!cmd)
-		error("Memory allocation error!");
+	if (!cmd_list->argc)
+		cmd = cmd_list;
+	else
+	{
+		cmd = (t_command *)malloc(sizeof(t_command));
+		if (!cmd)
+			error("Memory allocation error!");
+		cmd_list->next = cmd;
+		cmd->envp = cmd_list->envp;
+		cmd->head = cmd_list->head;
+		cmd_list = cmd_list->next;
+	}
 	cmd->argc = ft_word_count(str, ' ');
 	cmd->argv = ft_split(str, ' ');
+	cmd->background = parse(str, cmd_list);
 	if (cmd->argc)
 		cmd->builtin = parseBuiltin(cmd);
 	cmd->next = NULL;
-	cmd->envp = cmd_list->envp;
-	cmd->head = cmd_list->head;
-	if (cmd_list->argv == NULL)
-	{
-		cmd_list = cmd;
-		cmd_list->head = cmd;
-	}
-	else
-	{
-		cmd->head = cmd_list->head;
-		while (cmd_list->next != NULL)
-			cmd_list = cmd_list->next;
-		cmd_list->next = cmd;
-	}
 	return (cmd_list);
 }
 
-void	execute(t_command *cmd_list, int background)
+void	run(t_command *cmd)
+{
+	if (cmd->builtin)
+		run_builtin_cmd(cmd);
+	else
+		file_exists(cmd, cmd->background);
+}
+
+void	execute(t_command *cmd_list)
 {
 	while (cmd_list->next != NULL)
 	{
-		if (cmd_list->builtin)
-			run_builtin_cmd(cmd_list);
-		else
-			file_exists(cmd_list, background);
+		run(cmd_list);
 		cmd_list = cmd_list->next;
 	}
-	if (cmd_list->builtin)
-		run_builtin_cmd(cmd_list);
-	else if (cmd_list->argv[0])
-		file_exists(cmd_list, background);
+	run(cmd_list);
 }
 
 void eval(char *input, char **envp)
 {
-	int			background;										// should job run in background?
 	t_command	*cmd_list;										// parsed commands linked list
 	char		**cmds;											// array of commands coming from input
 	int			i;
@@ -210,21 +207,16 @@ void eval(char *input, char **envp)
 	i = 0;
 	if (!input)
 		return ;
-	cmds = ft_split_many(input, "|<>()");						// split input into commands
+	cmds = ft_split_many(input, ";|<>()");						// split input into commands
 	cmd_list = (t_command *)malloc(sizeof(t_command));
 	cmd_list->head = cmd_list;
+	cmd_list->envp = envp;
 	while (cmds[i])
 		i++;
 	i = 0;
 	while (cmds[i])
-	{
-		cmd_list->envp = envp;
-		cmd_list = ft_str2cmd(cmds[i], cmd_list);				// convert string to command
-		// ft_add_cmd(cmd_list.head, &cmd_list);				// add command to the cmd_list
-		background = parse(cmds[i], cmd_list);					// parse command line into cmd_list struct
-		i++;
-	}
-	execute(cmd_list->head, background);
+		cmd_list = ft_str2cmd(cmds[i++], cmd_list);										// convert string to command
+	execute(cmd_list->head);
 }
 					
 int	main(int argc, char **argv, char **envp) 
