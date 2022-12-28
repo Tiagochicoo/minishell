@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/12/27 12:29:18 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/12/27 19:40:22 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,31 +46,33 @@ typedef enum s_builtin
 	FT,
 }			t_builtin;
 
+typedef struct s_command 
+{
+	char		*cmd;							// command name
+	int			redirect[2];					// redirect input/output
+	int			background;						// run in background?
+	int			argc;							// number of args
+	char		**argv;							// arguments list
+	char		**envp;							// environment variables
+	t_builtin	builtin;						// is argv[0] a builtin command?
+	struct s_command	*next;					// next command in pipeline
+	struct s_command	*head;					// head of the pipeline
+}			t_command;	
+
 typedef struct s_cmd
 {
+	char	**envp;								// environment variables
 	char	*cmd;								// command name
 	int		redirect[2];						// redirect input/output
-	char	**args;								// arguments: must be NULL terminated
+	char	*args[];							// arguments: must be NULL terminated
 }		t_cmd;
 
 typedef struct s_pipeline
 {
-	int			num_cmds;							// number of commands in pipeline
-	t_command	*cmds[];							// array of commands
+	int			num_cmds;						// number of commands in pipeline
+	char		**envp;							// environment variables
+	t_cmd		*cmds[];						// array of commands
 }			t_pipeline;
-
-typedef struct s_command 
-{
-	char		*cmd;						// command name
-	int			redirect[2];				// redirect input/output
-	int			background;					// run in background?
-	int			argc;						// number of args
-	char		**argv;						// arguments list
-	char		**envp;						// environment variables
-	t_builtin	builtin;					// is argv[0] a builtin command?
-	struct s_command	*next;				// next command in pipeline
-	struct s_command	*head;				// head of the pipeline
-}			t_command;
 
 // typedef struct s_token
 // {
@@ -105,5 +107,6 @@ void	ft_ft(void);
 
 // PIPES
 t_pipeline	*parse_pipeline(char *input);
-pid_t		run_redir(t_cmd *cmd, int num_pipes, int (*pipes)[2]);
+pid_t	run_redir(t_cmd *cmd, int num_pipes, int (*pipes)[2]);
+
 #endif

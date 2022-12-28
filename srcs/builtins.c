@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/24 16:39:13 by tpereira          #+#    #+#             */
-/*   Updated: 2022/12/22 10:35:05 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/12/27 18:56:45 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@ void	echo(t_command *cmd)
 	int	i;
 
 	i = 1;
-	while (cmd->argv[i] != NULL && ft_strcmp(cmd->argv[i], "-n") == 0)
+	while (cmd->argv[i] != NULL && ft_strcmp(cmd->argv[i], "-n") == 0)		// -n flag is optional and can be used multiple times
 		i++;
-	while (cmd->argv[i] && cmd->argv[i][0] == '$')
+	while (cmd->argv[i] && cmd->argv[i][0] == '$') 							// if the argument starts with $, print the value of the environment variable
 	{
 		if (getenv(&cmd->argv[i][1]))
 			printf("%s ", getenv(&cmd->argv[i][1]));

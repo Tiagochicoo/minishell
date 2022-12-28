@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/12/27 12:28:02 by tpereira         ###   ########.fr       */
+/*   Updated: 2022/12/28 09:49:14 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void error(char *msg)
 int parse(const char *input, t_command *cmd) 
 {
 	static char	array[MAXLINE];								// local copy of command line
-	const char	delims[10] = " \t\r\n\"\'";					// argument delimiters
+	const char	delims[10] = " \t\r\n\"";					// argument delimiters
 	char		*line;										// ptr that traverses command line
 	char		*token;										// ptr to the end of the current arg
 	char		*endline;									// ptr to the end of the input string
@@ -198,31 +198,31 @@ void	execute(t_command *cmd_list)
 	run(cmd_list);
 }
 
-void	evaluate(char *input)
-{
-	t_pipeline	*pipeline;										// parsed commands linked list
-	int			num_pipes;										// number of pipes in input
-	int			(*pipes)[2];										// pipe file descriptors
-	int			i;
+// void	evaluate(char *input, char **envp)
+// {
+// 	t_pipeline	*pipeline;										// parsed commands linked list
+// 	int			num_pipes;										// number of pipes in input
+// 	int			(*pipes)[2];									// pipe file descriptors
+// 	int			i;
 
-	pipeline = parse_pipeline(input);
-	num_pipes = pipeline->num_cmds - 1;
-	pipes = calloc(sizeof(int[2]), num_pipes);
-	i = 1;
-	while (i < pipeline->num_cmds)
-	{
-		pipe(pipes[i - 1]);
-		pipeline->cmds[i]->redirect[STDIN_FILENO] = pipes[i - 1][0]; 		// read end of previous pipe
-		pipeline->cmds[i]->redirect[STDOUT_FILENO] = pipes[i][1]; 			// write end of current pipe
-		i++;
-	}
-	i = 0;
-	while (i < pipeline->num_cmds)
-	{
-		run_redir(pipeline->cmds[i], num_pipes, pipes);
-		i++;
-	}
-}
+// 	pipeline = parse_pipeline(input);
+// 	num_pipes = pipeline->num_cmds - 1;
+// 	pipes = calloc(sizeof(int[2]), num_pipes);
+// 	i = 1;
+// 	while (i < pipeline->num_cmds)
+// 	{
+// 		pipe(pipes[i - 1]);
+// 		pipeline->cmds[i]->redirect[STDIN_FILENO] = pipes[i - 1][0]; 		// read end of previous pipe
+// 		pipeline->cmds[i]->redirect[STDOUT_FILENO] = pipes[i][1]; 			// write end of current pipe
+// 		i++;
+// 	}
+// 	i = 0;
+// 	while (i < pipeline->num_cmds)
+// 	{
+// 		run_redir(pipeline->cmds[i], num_pipes, pipes);
+// 		i++;
+// 	}
+// }
 
 void eval(char *input, char **envp)
 {
@@ -237,15 +237,12 @@ void eval(char *input, char **envp)
 	cmd_list = (t_command *)malloc(sizeof(t_command));
 	cmd_list->head = cmd_list;
 	cmd_list->envp = envp;
-	// while (cmds[i])
-	// 	i++;
-	// i = 0;
 	while (cmds[i])
 		cmd_list = ft_str2cmd(cmds[i++], cmd_list);										// convert string to command
 	execute(cmd_list->head);
 }
 					
-int	main(int argc, char **argv, char **envp) 
+int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp-- argument
 {
 	char	*input;										// buffer for readline
 	char	*cwd;
