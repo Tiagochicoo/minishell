@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/04 17:44:19 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/04 18:20:43 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,7 @@ void	file_exists(t_command *cmd, int bg)
 		else
 			perror("Error");
 	}
+	free(tmp);
 }
 
 void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
@@ -155,29 +156,36 @@ void run_builtin_cmd(t_command *cmd)
 // 	cmd->next = NULL;
 // }
 
-t_command *ft_str2cmd(char *str, t_command *cmd_list)
+
+// function to create a new command from a string
+
+t_command *ft_new_cmd(char *str)
 {
 	t_command *cmd;
 
-	if (!cmd_list->argc)
-		cmd = cmd_list;
-	else
-	{
-		cmd = (t_command *)malloc(sizeof(t_command));
-		if (!cmd)
-			error("Memory allocation error!");
-		cmd_list->next = cmd;
-		cmd->envp = cmd_list->envp;
-		cmd->head = cmd_list->head;
-		//cmd_list = cmd_list->next;
-	}
+	cmd = malloc(sizeof(t_command));
+	if (!cmd)
+		error("malloc error");
 	cmd->argc = ft_word_count(str, ' ');
 	cmd->argv = ft_split(str, " ");
 	cmd->background = parse(str, cmd);
 	if (cmd->argc)
 		cmd->builtin = parseBuiltin(cmd);
 	cmd->next = NULL;
-	return (cmd_list);
+	return (cmd);
+}
+
+t_command *ft_str2cmd(char *str, t_command *cmd_list)
+{
+	t_command *cmd;
+
+	if (!cmd_list->argc)					// if the first command is empty
+		cmd = cmd_list;						// then we don't need to malloc
+	else									// else we need to malloc and add the command to the end of the list
+		cmd = ft_new_cmd(str);
+	if (cmd->argc)
+		cmd->builtin = parseBuiltin(cmd);
+	return (cmd);
 }
 
 void	run(t_command *cmd)
@@ -185,10 +193,7 @@ void	run(t_command *cmd)
 	if (cmd->builtin)
 		run_builtin_cmd(cmd);
 	else
-	{
 		file_exists(cmd, cmd->background);
-		ft_free_cmd(cmd);
-	}
 }
 
 void	execute(t_command *cmd_list)
@@ -241,12 +246,9 @@ void eval(char *input, char **envp)
 	cmd_list->head = cmd_list;
 	cmd_list->envp = envp;
 	while (cmds[i])
-	{
-		cmd_list = ft_str2cmd(cmds[i], cmd_list);				// convert string to command
-		free(cmds[i++]);
-	}
+		cmd_list = ft_str2cmd(cmds[i++], cmd_list);				// convert string to command
+	ft_free_split(cmds);
 	execute(cmd_list->head);
-	ft_free_cmd(cmd_list);
 }
 					
 int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp-- argument
@@ -256,11 +258,11 @@ int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp
 	char	*tmp;
 
 	setting_signal();
-	tmp = getcwd(NULL, 0);
 	if (argv[0] != NULL)
 	{
 		while (argc > 0)
 		{
+			tmp = getcwd(NULL, 0);
 			cwd = ft_relative_path(tmp);
 			printf("%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
 			input = readline(YELLOW "~" RESET " ");
@@ -275,8 +277,9 @@ int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp
 				exit (0);
 			if (*input)
 				eval(input, envp);						// Evaluate input
+			free(cwd);
+			free(tmp);
 		}
 	}
-	free(tmp);
 	return (0);
 }
