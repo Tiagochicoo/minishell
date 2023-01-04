@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/25 18:29:02 by tpereira          #+#    #+#             */
-/*   Updated: 2022/10/28 19:04:31 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/04 16:50:42 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ char	*ft_find_cmd(t_command *cmd)					// needs to free return value!!!!
 	if (ft_str_isalnum(cmd->argv[0]))
 	{
 		path = getenv("PATH");
-		all_paths = ft_split(path, ':');
+		all_paths = ft_split(path, ":");
 		//free(path);                                   // free path? or not?
 		while (all_paths[i])
 		{
@@ -33,7 +33,7 @@ char	*ft_find_cmd(t_command *cmd)					// needs to free return value!!!!
 			if (!access(cmd_path, X_OK))
 			{
 				free(temp_path);
-				ft_delete_split_arr(all_paths);
+				ft_free_split(all_paths);
 				return (cmd_path);
 			}
 			free(cmd_path);
@@ -41,7 +41,7 @@ char	*ft_find_cmd(t_command *cmd)					// needs to free return value!!!!
 			cmd_path = NULL;
 			i++;
 		}
-		ft_delete_split_arr(all_paths);
+		ft_free_split(all_paths);
 	}
 	else
 		cmd_path = NULL;

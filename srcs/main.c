@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2022/12/28 09:49:14 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/04 17:44:19 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,7 @@ void run_builtin_cmd(t_command *cmd)
 	else if (cmd->builtin == UNSET)
 		unset(cmd);
 	else if (cmd->builtin == EXIT)
-		exit(0);
+		ft_exit(cmd);
 	else if (cmd->builtin == FT)
 		ft_ft();
 }
@@ -172,7 +172,7 @@ t_command *ft_str2cmd(char *str, t_command *cmd_list)
 		//cmd_list = cmd_list->next;
 	}
 	cmd->argc = ft_word_count(str, ' ');
-	cmd->argv = ft_split(str, ' ');
+	cmd->argv = ft_split(str, " ");
 	cmd->background = parse(str, cmd);
 	if (cmd->argc)
 		cmd->builtin = parseBuiltin(cmd);
@@ -185,7 +185,10 @@ void	run(t_command *cmd)
 	if (cmd->builtin)
 		run_builtin_cmd(cmd);
 	else
+	{
 		file_exists(cmd, cmd->background);
+		ft_free_cmd(cmd);
+	}
 }
 
 void	execute(t_command *cmd_list)
@@ -233,26 +236,32 @@ void eval(char *input, char **envp)
 	i = 0;
 	if (!input)
 		return ;
-	cmds = ft_split_many(input, ";|<>()");						// split input into commands
+	cmds = ft_split(input, ";|<>()");							// split input into commands
 	cmd_list = (t_command *)malloc(sizeof(t_command));
 	cmd_list->head = cmd_list;
 	cmd_list->envp = envp;
 	while (cmds[i])
-		cmd_list = ft_str2cmd(cmds[i++], cmd_list);										// convert string to command
+	{
+		cmd_list = ft_str2cmd(cmds[i], cmd_list);				// convert string to command
+		free(cmds[i++]);
+	}
 	execute(cmd_list->head);
+	ft_free_cmd(cmd_list);
 }
 					
 int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp-- argument
 {
 	char	*input;										// buffer for readline
 	char	*cwd;
+	char	*tmp;
 
 	setting_signal();
+	tmp = getcwd(NULL, 0);
 	if (argv[0] != NULL)
 	{
 		while (argc > 0)
 		{
-			cwd = ft_relative_path(getcwd(NULL, 0));
+			cwd = ft_relative_path(tmp);
 			printf("%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
 			input = readline(YELLOW "~" RESET " ");
 			if (!input)
@@ -268,5 +277,6 @@ int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp
 				eval(input, envp);						// Evaluate input
 		}
 	}
+	free(tmp);
 	return (0);
 }

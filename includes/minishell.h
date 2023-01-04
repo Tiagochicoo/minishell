@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2022/12/27 19:40:22 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/04 17:00:33 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ void	export(t_command *cmd);
 void	pwd(void);
 void	cd(t_command *cmd);
 void	echo(t_command *cmd);
+void	ft_exit(t_command *cmd);
 
 // UTILS.C
 char	*ft_relative_path(char *cwd);
@@ -108,5 +109,10 @@ void	ft_ft(void);
 // PIPES
 t_pipeline	*parse_pipeline(char *input);
 pid_t	run_redir(t_cmd *cmd, int num_pipes, int (*pipes)[2]);
+
+// DESTROY
+
+void    ft_free_cmd(t_command *cmd);
+
 
 #endif

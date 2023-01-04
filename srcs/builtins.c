@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/24 16:39:13 by tpereira          #+#    #+#             */
-/*   Updated: 2022/12/27 18:56:45 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/04 17:11:59 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void	echo(t_command *cmd)
 		printf("\n");
 	if (cmd->argv[1] != NULL && ft_strcmp(cmd->argv[1], "-n") == 0)
 		printf("\b");
+	ft_free_cmd(cmd);
 }
 
 void	cd(t_command *cmd)
@@ -44,6 +45,7 @@ void	cd(t_command *cmd)
 	}
 	else
 		printf("cd: too many arguments\n");
+	ft_free_cmd(cmd);
 }
 
 void	pwd(void)
@@ -82,6 +84,7 @@ void	export(t_command *cmd)
 			printf("export: `%s': not a valid identifier\n", argv);
 		i++;
 	}
+	ft_free_cmd(cmd);
 }
 
 void	unset(t_command *cmd)
@@ -91,6 +94,7 @@ void	unset(t_command *cmd)
 	i = 1;
 	while (cmd->argv[i])
 		unsetenv(cmd->argv[i++]);
+	ft_free_cmd(cmd);
 }
 
 void	env(char **envp)
@@ -100,6 +104,12 @@ void	env(char **envp)
 	i = 0;
 	while (envp[i])
 		printf("%s \n", envp[i++]);
+}
+
+void	ft_exit(t_command *cmd)
+{
+	ft_free_cmd(cmd);
+	exit(0);
 }
 
 /*

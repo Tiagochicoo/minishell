@@ -1,28 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   destroy.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/10/24 22:12:21 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/04 16:51:01 by tpereira         ###   ########.fr       */
+/*   Created: 2023/01/04 16:55:43 by tpereira          #+#    #+#             */
+/*   Updated: 2023/01/04 17:01:09 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-char    *ft_relative_path(char *cwd)
+void    ft_destroy_cmd(t_command *cmd)
 {
-    char    **tmp;
-    char    *path;
-    int     i;
+    free(cmd->cmd);
+    ft_free_split(cmd->argv);
+    ft_free_split(cmd->envp);
+}
 
-    i = 0;
-    tmp = ft_split(cwd, "/");
-    while (tmp[i])
-        i++;
-    path = ft_strdup(tmp[i - 1]);
-    ft_free_split(tmp);
-    return (path);
+void    ft_free_cmd(t_command *cmd)
+{
+    while (cmd->next)
+    {
+        ft_destroy_cmd(cmd);
+        cmd = cmd->next;
+    }
+    //ft_destroy_cmd(cmd);
 }

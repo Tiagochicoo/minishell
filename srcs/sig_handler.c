@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   sig_handler.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/03 16:49:40 by tpereira          #+#    #+#             */
-/*   Updated: 2022/11/23 22:11:32 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/04 17:04:49 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,17 @@ void handler(int signal)
 	pid_t	pid;
 	int		status;
 	char	*cwd;
+	char	*tmp;
 
 	pid = waitpid(-1, &status, 0);
+	tmp = getcwd(NULL, 0);
 	if (signal == SIGINT)
 	{
 		if (pid == -1)
 		{
-			cwd = ft_relative_path(getcwd(NULL, 0));
+			cwd = ft_relative_path(tmp);
 			printf("\n%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
+			free(cwd);
 			rl_replace_line("", 0);
 			rl_on_new_line();
 			rl_redisplay();
@@ -41,4 +44,5 @@ void handler(int signal)
 	}
 	if (signal == SIGQUIT)
 		write(1, "\n", 1);
+	free(tmp);	
 }

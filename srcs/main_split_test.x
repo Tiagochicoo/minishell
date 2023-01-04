@@ -1,25 +1,69 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_split.c                                         :+:      :+:    :+:   */
+/*   main_split_test.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/27 08:59:57 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/04 17:02:07 by tpereira         ###   ########.fr       */
+/*   Created: 2023/01/04 16:29:39 by tpereira          #+#    #+#             */
+/*   Updated: 2023/01/04 16:47:47 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-void	ft_free_split(char **arr)
+
+
+char	*ft_strchr(const char *s, int c)
+{
+	while (*s)
+	{
+		if (*s == (char)c)
+			return ((char *)s);
+		s++;
+	}
+	if (*s == '\0' && c == '\0')
+	{
+		return (0);
+	}
+	return (0);
+}
+
+size_t	ft_strlcpy(char *dest, const char *src, size_t size)
+{
+	size_t	i;
+
+	if (!dest || !src)
+		return (0);
+	i = 0;
+	while (src[i])
+		i++;
+	if (size == 0)
+		return (i);
+	i = 0;
+	while (src[i] && i < size - 1)
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	i = 0;
+	while (src[i])
+		i++;
+	return (i);
+}
+
+size_t	ft_strlen(const char *str)
 {
 	int	i;
 
 	i = 0;
-	while (arr[i])
-        free(arr[i++]);
-    free(&arr[0]);
+	if (str == NULL)
+		return (0);
+	while (str[i])
+		i++;
+	return (i);
 }
 
 char	finish(char buffer[], int count[], char **str_arr)
@@ -62,7 +106,7 @@ void	str_alloc(const char *str, char *charset, int i, char **str_arr)
 	}
 }
 
-char	**ft_split(const char *str, char *charset)
+char	**ft_split(char *str, char *charset)
 {
 	int		len;
 	int		count;
@@ -89,4 +133,29 @@ char	**ft_split(const char *str, char *charset)
 	str_arr[count] = NULL;
 	str_alloc(str, charset, 0, str_arr);
 	return (str_arr);
+}
+
+void	ft_free_split(char **arr)
+{
+	int	i;
+
+	i = 0;
+	while (arr[i])
+    {
+        printf("%d - %s\n", i, arr[i]);
+        free(arr[i]);
+        i++;
+    }
+    free(&arr[0]);
+}
+
+
+int main(void)
+{
+    char    **tmp;
+
+    tmp = ft_split("ls -la | grep .c", "|<>()");
+    ft_free_split(tmp);
+
+    return (0);
 }
