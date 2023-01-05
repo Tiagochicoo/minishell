@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/03 16:49:40 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/04 17:04:49 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/04 17:58:23 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,10 @@ void handler(int signal)
 		{
 			cwd = ft_relative_path(tmp);
 			printf("\n%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
-			free(cwd);
 			rl_replace_line("", 0);
 			rl_on_new_line();
 			rl_redisplay();
+			free(cwd);
 		}
 		else
 			write(1, "\n", 1);
