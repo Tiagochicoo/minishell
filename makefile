@@ -6,13 +6,13 @@
 #    By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/22 16:50:02 by tpereira          #+#    #+#              #
-#    Updated: 2023/01/04 17:40:01 by tpereira         ###   ########.fr        #
+#    Updated: 2023/01/05 17:08:42 by tpereira         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 MINISHELL   = minishell
 CC          = gcc
-CFLAGS      = -Wall -Wextra -Werror -g -lreadline -L /opt/homebrew/Cellar/readline/8.1.2/lib/ -I /opt/homebrew/Cellar/readline/8.1.2/include -fsanitize=address
+CFLAGS      = -Wall -Wextra -Werror -g -lreadline -L /opt/homebrew/Cellar/readline/8.1.2/lib/ -I /opt/homebrew/Cellar/readline/8.1.2/include 
 SRCS        = ./srcs/*.c
 LIB         = libft/libft.a
 

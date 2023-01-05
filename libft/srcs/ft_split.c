@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/27 08:59:57 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/04 17:02:07 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/05 16:25:45 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,15 @@
 
 void	ft_free_split(char **arr)
 {
-	int	i;
+	char **tmp;
 
-	i = 0;
-	while (arr[i])
-        free(arr[i++]);
-    free(&arr[0]);
+	tmp = arr;
+	while (*arr)
+	{
+		free(*arr);
+		arr++;
+	}
+	free(tmp);
 }
 
 char	finish(char buffer[], int count[], char **str_arr)
