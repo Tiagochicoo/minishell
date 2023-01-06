@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/05 17:08:02 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/06 15:03:39 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,7 +253,8 @@ void eval(char *input, char **envp)
 	while (cmds[i])
 		cmd_list = ft_str2cmd(cmds[i++], cmd_list);			// convert string to command
 	execute(cmd_list->head);
-	ft_free_split(cmds);
+	//ft_free_cmd(cmd_list->head);
+	ft_free_split(&cmds[0]);
 }
 					
 int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp-- argument

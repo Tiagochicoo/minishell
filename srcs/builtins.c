@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/24 16:39:13 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/05 15:00:33 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/06 14:37:00 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ void	echo(t_command *cmd)
 		printf("\n");
 	if (cmd->argv[1] != NULL && ft_strcmp(cmd->argv[1], "-n") == 0)
 		printf("\b");
-	ft_free_cmd(cmd);
 }
 
 void	cd(t_command *cmd)
