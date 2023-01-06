@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/05 17:08:02 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/06 17:08:12 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,12 +235,41 @@ void	execute(t_command *cmd_list)
 // 	}
 // }
 
+// t_pipeline	parse_pipeline(char *input)
+// {
+// 	t_pipeline	pipeline;
+// 	char		*copy;
+// 	char		*tmp;
+// 	int			i;
+
+// 	// count pipe characters in input
+// 	i = 0;
+// 	copy = ft_strdup(input);
+// 	tmp = copy;
+// 	while (*tmp)
+// 	{
+// 		if (*tmp == '|')
+// 			i++;
+// 		tmp++;
+// 	}
+// 	pipeline.num_cmds = i + 1;
+// 	pipeline.cmds = (t_command **)malloc(sizeof(t_command *) * pipeline.num_cmds);
+	
+// 	// split input into commands
+// 	i = 0;
+// 	tmp = ft_split(copy, "|");
+
+
+// }
+
 void eval(char *input, char **envp)
 {
+	//t_pipeline	*pipeline;										// parsed commands linked list
 	t_command	*cmd_list;										// parsed commands linked list
 	char		**cmds;											// array of commands coming from input
 	int			i;
 
+	//pipeline = parse_pipeline(input);
 	i = 0;
 	if (!input)
 		return ;
@@ -263,11 +292,11 @@ int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp
 	char	*tmp;
 
 	setting_signal();
-	tmp = getcwd(NULL, 0);
 	if (argv[0] != NULL)
 	{
 		while (argc > 0)
 		{
+			tmp = getcwd(NULL, 0);
 			cwd = ft_relative_path(tmp);
 			printf("%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
 			free(cwd);
@@ -283,8 +312,8 @@ int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp
 				exit (0);
 			if (*input)
 				eval(input, envp);						// Evaluate input
+			free(tmp);
 		}
 	}
-	free(tmp);
 	return (0);
 }

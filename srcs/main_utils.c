@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/25 18:29:02 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/04 16:50:42 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/06 16:28:35 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ char	*ft_find_cmd(t_command *cmd)					// needs to free return value!!!!
 	{
 		path = getenv("PATH");
 		all_paths = ft_split(path, ":");
-		//free(path);                                   // free path? or not?
 		while (all_paths[i])
 		{
 			temp_path = ft_strjoin(all_paths[i], "/");

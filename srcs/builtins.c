@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/24 16:39:13 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/05 15:00:33 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/06 17:16:39 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,25 @@ void	env(char **envp)
 
 void	ft_exit(t_command *cmd)
 {
+	int num;
+
+	num = 1;
+	if (cmd->argc == 1)
+		exit(0);				// need to implement exit status from last command executed
+	else if (cmd->argc == 2)
+	{
+		if (ft_isdigit(cmd->argv[1][0]) == 0)
+			printf("exit: %s: numeric argument required\n", cmd->argv[1]);
+		else
+			num = ft_atoi(cmd->argv[1]);
+		exit(num);
+	}
+	else
+	{
+		printf("exit: too many arguments\n");
+		exit(1);
+	}
+	num = ft_atoi(cmd->argv[1]);
 	ft_free_cmd(cmd);
 	exit(0);
 }

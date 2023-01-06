@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2023/01/04 17:00:33 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/06 15:59:55 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,6 @@ typedef struct s_cmd
 typedef struct s_pipeline
 {
 	int			num_cmds;						// number of commands in pipeline
-	char		**envp;							// environment variables
 	t_cmd		*cmds[];						// array of commands
 }			t_pipeline;
 
