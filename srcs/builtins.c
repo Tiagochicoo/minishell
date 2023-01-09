@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/24 16:39:13 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/09 11:12:41 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/09 12:28:56 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,19 +34,19 @@ void	echo(t_command *cmd)
 	ft_free_cmd(cmd);
 }
 
-void	cd(t_command *cmd)
-{
-	if (cmd->argc == 1)
-		chdir(getenv("HOME"));
-	else if (cmd->argc == 2)
-	{
-		if (chdir(cmd->argv[1]) == -1)
-			printf("cd: %s: No such file or directory\n", cmd->argv[1]);
-	}
-	else
-		printf("cd: too many arguments\n");
-	ft_free_cmd(cmd);
-}
+// void	cd(t_command *cmd)
+// {
+// 	if (cmd->argc == 1)
+// 		chdir(getenv("HOME"));
+// 	else if (cmd->argc == 2)
+// 	{
+// 		if (chdir(cmd->argv[1]) == -1)
+// 			printf("cd: %s: No such file or directory\n", cmd->argv[1]);
+// 	}
+// 	else
+// 		printf("cd: too many arguments\n");
+// 	ft_free_cmd(cmd);
+// }
 
 void	pwd(void)
 {
@@ -106,30 +106,30 @@ void	env(char **envp)
 		printf("%s \n", envp[i++]);
 }
 
-void	ft_exit(t_command *cmd)
-{
-	int num;
+// void	ft_exit(t_command *cmd)
+// {
+// 	int num;
 
-	num = 1;
-	if (cmd->argc == 1)
-		exit(0);				// need to implement exit status from last command executed
-	else if (cmd->argc == 2)
-	{
-		if (ft_isdigit(cmd->argv[1][0]) == 0)
-			printf("exit: %s: numeric argument required\n", cmd->argv[1]);
-		else
-			num = ft_atoi(cmd->argv[1]);
-		exit(num);
-	}
-	else
-	{
-		printf("exit: too many arguments\n");
-		exit(1);
-	}
-	num = ft_atoi(cmd->argv[1]);
-	ft_free_cmd(cmd);
-	exit(0);
-}
+// 	num = 1;
+// 	if (cmd->argc == 1)
+// 		exit(0);				// need to implement exit status from last command executed
+// 	else if (cmd->argc == 2)
+// 	{
+// 		if (ft_isdigit(cmd->argv[1][0]) == 0)
+// 			printf("exit: %s: numeric argument required\n", cmd->argv[1]);
+// 		else
+// 			num = ft_atoi(cmd->argv[1]);
+// 		exit(num);
+// 	}
+// 	else
+// 	{
+// 		printf("exit: too many arguments\n");
+// 		exit(1);
+// 	}
+// 	num = ft_atoi(cmd->argv[1]);
+// 	ft_free_cmd(cmd);
+// 	exit(0);
+// }
 
 /*
 	

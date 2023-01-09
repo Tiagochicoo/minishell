@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpereira <tpereira@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/08 23:02:16 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/04 16:51:10 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/09 11:38:12 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,5 +102,7 @@ int				get_next_line(int fd, char **line);
 long long		ft_word_count(char *str, char charset);
 int				ft_strspn(const char *s, const char *accept);
 int				ft_strcspn(const char *s, const char *reject);
+char			*ft_strsep(char **stringp, const char *delim);
+
 
 #endif

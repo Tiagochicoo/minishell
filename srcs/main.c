@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/09 10:52:59 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/09 12:46:20 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,42 +40,42 @@ void error(char *msg)
 	exit(0);
 }
 
-int parse(const char *input, t_command *cmd) 
-{
-	static char	array[MAXLINE];								// local copy of command line
-	const char	delims[10] = " \t\r\n\"";					// argument delimiters
-	char		*line;										// ptr that traverses command line
-	char		*token;										// ptr to the end of the current arg
-	char		*endline;									// ptr to the end of the input string
-	int			is_bg;										// background job?
+// int parse(const char *input, t_command *cmd) 
+// {
+// 	static char	array[MAXLINE];								// local copy of command line
+// 	const char	delims[10] = " \t\r\n\"";					// argument delimiters
+// 	char		*line;										// ptr that traverses command line
+// 	char		*token;										// ptr to the end of the current arg
+// 	char		*endline;									// ptr to the end of the input string
+// 	int			is_bg;										// background job?
 
-	line = array;
-	if (input == NULL)
-		error("command line is NULL\n");
-	(void) ft_strncpy(line, input, MAXLINE);
-	endline = line + ft_strlen(line);
-	cmd->argc = 0;											// build argv list
-	while (line < endline)
-	{
-		line += ft_strspn(line, delims);					// skip delimiters
-		if (line >= endline)
-			break;
-		token = line + ft_strcspn(line, delims);			// Find token delimiter
-		*token = '\0';										// terminate the token
-		strncpy(cmd->argv[cmd->argc++], line, ft_strlen(line));						// Record token as the token argument
-		if (cmd->argc >= MAXARGS - 1)						// Check if argv is full
-			break;
-		line = token + 1;
-	}
-	//cmd->argv[cmd->argc] = NULL;							// argument list must end with a NULL pointer
-	if (cmd->argc == 0)										// ignore blank line
-		return 1;
-	cmd->builtin = parseBuiltin(cmd);
-	is_bg = (*cmd->argv[cmd->argc-1] == '&');
-	if (is_bg)												// should job run in background?
-		cmd->argv[--cmd->argc] = NULL;
-	return is_bg;
-}
+// 	line = array;
+// 	if (input == NULL)
+// 		error("command line is NULL\n");
+// 	(void) ft_strncpy(line, input, MAXLINE);
+// 	endline = line + ft_strlen(line);
+// 	cmd->argc = 0;											// build argv list
+// 	while (line < endline)
+// 	{
+// 		line += ft_strspn(line, delims);					// skip delimiters
+// 		if (line >= endline)
+// 			break;
+// 		token = line + ft_strcspn(line, delims);			// Find token delimiter
+// 		*token = '\0';										// terminate the token
+// 		strncpy(cmd->argv[cmd->argc++], line, ft_strlen(line));						// Record token as the token argument
+// 		if (cmd->argc >= MAXARGS - 1)						// Check if argv is full
+// 			break;
+// 		line = token + 1;
+// 	}
+// 	//cmd->argv[cmd->argc] = NULL;							// argument list must end with a NULL pointer
+// 	if (cmd->argc == 0)										// ignore blank line
+// 		return 1;
+// 	cmd->builtin = parseBuiltin(cmd);
+// 	is_bg = (*cmd->argv[cmd->argc-1] == '&');
+// 	if (is_bg)												// should job run in background?
+// 		cmd->argv[--cmd->argc] = NULL;
+// 	return is_bg;
+// }
 
 void	file_exists(t_command *cmd, int bg)
 {
@@ -156,48 +156,48 @@ void run_builtin_cmd(t_command *cmd)
 // 	cmd->next = NULL;
 // }
 
-t_command *ft_str2cmd(char *str, t_command *cmd_list)
-{
-	t_command	*cmd;
+// t_command *ft_str2cmd(char *str, t_command *cmd_list)
+// {
+// 	t_command	*cmd;
 
-	if (!cmd_list->argc)
-	{
-		cmd = cmd_list;
-		cmd->argc = ft_word_count(str, ' ');
-		cmd->argv = ft_split(str, " ");
-		cmd->background = parse(str, cmd);
-		if (cmd->argc)
-			cmd->builtin = parseBuiltin(cmd);
-		cmd->next = NULL;
-	}
-	else
-	{
-		cmd = (t_command *)malloc(sizeof(t_command));
-		if (!cmd)
-			error("Memory allocation error!");
-		cmd->envp = cmd_list->envp;
-		cmd->head = cmd_list->head;
-		cmd->argc = ft_word_count(str, ' ');
-		cmd->argv = ft_split(str, " ");
-		cmd->background = parse(str, cmd);
-		if (cmd->argc)
-			cmd->builtin = parseBuiltin(cmd);
-		cmd->next = NULL;		
-		cmd_list->next = cmd;
-	}
-	return (cmd);
-}
+// 	if (!cmd_list->argc)
+// 	{
+// 		cmd = cmd_list;
+// 		cmd->argc = ft_word_count(str, ' ');
+// 		cmd->argv = ft_split(str, " ");
+// 		cmd->background = parse(str, cmd);
+// 		if (cmd->argc)
+// 			cmd->builtin = parseBuiltin(cmd);
+// 		cmd->next = NULL;
+// 	}
+// 	else
+// 	{
+// 		cmd = (t_command *)malloc(sizeof(t_command));
+// 		if (!cmd)
+// 			error("Memory allocation error!");
+// 		cmd->envp = cmd_list->envp;
+// 		cmd->head = cmd_list->head;
+// 		cmd->argc = ft_word_count(str, ' ');
+// 		cmd->argv = ft_split(str, " ");
+// 		cmd->background = parse(str, cmd);
+// 		if (cmd->argc)
+// 			cmd->builtin = parseBuiltin(cmd);
+// 		cmd->next = NULL;		
+// 		cmd_list->next = cmd;
+// 	}
+// 	return (cmd);
+// }
 
-void	run(t_command *cmd)
-{
-	if (cmd->builtin)
-		run_builtin_cmd(cmd);
-	else
-	{
-		file_exists(cmd, cmd->background);
-		ft_free_cmd(cmd);
-	}
-}
+// void	run(t_command *cmd)
+// {
+// 	if (cmd->builtin)
+// 		run_builtin_cmd(cmd);
+// 	else
+// 	{
+// 		file_exists(cmd, cmd->background);
+// 		ft_free_cmd(cmd);
+// 	}
+// }
 
 void	execute(t_command *cmd_list)
 {
@@ -235,57 +235,83 @@ void	execute(t_command *cmd_list)
 // 	}
 // }
 
-// t_pipeline	parse_pipeline(char *input)
-// {
-// 	t_pipeline	pipeline;
-// 	char		*copy;
-// 	char		*tmp;
-// 	int			i;
-
-// 	// count pipe characters in input
-// 	i = 0;
-// 	copy = ft_strdup(input);
-// 	tmp = copy;
-// 	while (*tmp)
-// 	{
-// 		if (*tmp == '|')
-// 			i++;
-// 		tmp++;
-// 	}
-// 	pipeline.num_cmds = i + 1;
-// 	pipeline.cmds = (t_command **)malloc(sizeof(t_command *) * pipeline.num_cmds);
-	
-// 	// split input into commands
-// 	i = 0;
-// 	tmp = ft_split(copy, "|");
-
-
-// }
-
-void eval(char *input, char **envp)
+t_command *parse_cmd(char *input)
 {
-	//t_pipeline	*pipeline;										// parsed commands linked list
-	t_command	*cmd_list;										// parsed commands linked list
-	char		**cmds;											// array of commands coming from input
+	t_command	*cmd;
+	char		*token;
+	char		*copy;
+
+	copy = ft_strdup(input);
+	cmd = calloc(sizeof(t_command) + MAXLINE * sizeof(char *), 1);
+	token = ft_strsep(&copy, " \t\n\r");
+	while (*token)
+	{
+		cmd->name = cmd->argv[0];
+		cmd->redirect[1] = -1;
+		cmd->redirect[0] = -1;
+		cmd->argv = ft_split(input, " \t\n\r");
+		cmd->path = ft_find_cmd(cmd);
+		token = ft_strsep(&copy, " \t\n\r");
+	}
+	return (cmd);
+}
+
+t_pipeline	*parse_pipeline(char *input)
+{
+	t_pipeline	*pipeline;
+	char		*copy;
+	char		*tmp;
+	int			num_cmds;
 	int			i;
 
-	//pipeline = parse_pipeline(input);
+	// count pipe characters in input
 	i = 0;
-	if (!input)
-		return ;
-	cmds = ft_split(input, ";|<>");						// split input into commands
-	cmd_list = (t_command *)malloc(sizeof(t_command));
-	cmd_list->head = cmd_list;
-	cmd_list->envp = envp;
-	cmd_list->argc = 0;
-	cmd_list->argv = NULL;
-	while (cmds[i])
-		cmd_list = ft_str2cmd(cmds[i++], cmd_list);			// convert string to command
-	execute(cmd_list->head);
-	ft_free_split(cmds);
+	num_cmds = 0;
+	copy = ft_strdup(input);
+	tmp = copy;
+	while (*copy)
+	{
+		if (*copy == '|')
+			num_cmds++;
+		copy++;
+	}
+	copy = tmp;
+	num_cmds++;
+	pipeline = calloc(sizeof(t_pipeline) + num_cmds * sizeof(t_command*), 1); 
+	pipeline->num_cmds = num_cmds;
+	tmp = ft_strsep(&copy, "|");
+	while (tmp)
+	{
+		pipeline->cmds[i++] = parse_cmd(tmp);
+		tmp = ft_strsep(&copy, "|");
+	}
+	return (pipeline);
 }
-					
-int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp-- argument
+
+void eval(char *input)
+{
+	t_pipeline	*pipeline;
+	int			num_pipes;
+	int			*pipes[2];
+	int			i;
+
+	pipeline = parse_pipeline(input);
+	num_pipes = pipeline->num_cmds - 1;
+	*pipes = (int *)calloc(sizeof(int[2]), num_pipes);
+	i = 1;
+	while (i < pipeline->num_cmds)
+	{
+		pipe(pipes[i - 1]);
+		pipeline->cmds[i]->redirect[STDIN_FILENO] = pipes[i - 1][0]; 		// read end of previous pipe
+		pipeline->cmds[i]->redirect[STDOUT_FILENO] = pipes[i][1]; 			// write end of current pipe
+		i++;
+	}
+	i = 0;
+	while (i < pipeline->num_cmds)
+		run_redir(pipeline->cmds[i++], num_pipes, pipes);
+}
+
+int	main(int argc, char **argv) 						// don't forget --char **envp-- argument
 {
 	char	*input;										// buffer for readline
 	char	*cwd;
@@ -311,7 +337,7 @@ int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp
 			else if (feof(stdin))
 				exit (0);
 			if (*input)
-				eval(input, envp);						// Evaluate input
+				eval(input);						// Evaluate input
 			free(tmp);
 		}
 	}

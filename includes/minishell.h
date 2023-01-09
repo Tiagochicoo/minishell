@@ -6,22 +6,22 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2023/01/09 10:50:20 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/09 12:32:08 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
-#define MINISHELL_H
+# define MINISHELL_H
 
-#include "../libft/includes/libft.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <string.h>
-#include <signal.h>
-#include <sys/wait.h>
-#include <sys/types.h>
+# include "../libft/includes/libft.h"
+# include <stdio.h>
+# include <stdlib.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+# include <string.h>
+# include <signal.h>
+# include <sys/wait.h>
+# include <sys/types.h>
 
 # define RED "\x1B[31m"
 # define GREEN "\x1B[32m"
@@ -49,10 +49,9 @@ typedef enum s_builtin
 
 typedef struct s_command 
 {
-	char		*cmd;							// command name
+	char		*name;							// command name
 	int			redirect[2];					// redirect input/output
-	int			background;						// run in background?
-	int			argc;							// number of args
+	char		*path;							// path to executable
 	char		**argv;							// arguments list
 	char		**envp;							// environment variables
 	t_builtin	builtin;						// is argv[0] a builtin command?
@@ -71,7 +70,7 @@ typedef struct s_cmd
 typedef struct s_pipeline
 {
 	int			num_cmds;						// number of commands in pipeline
-	t_cmd		*cmds[];						// array of commands
+	t_command	*cmds[];						// array of commands
 }			t_pipeline;
 
 // typedef struct s_token
@@ -108,7 +107,7 @@ void	ft_ft(void);
 
 // PIPES
 t_pipeline	*parse_pipeline(char *input);
-pid_t	run_redir(t_cmd *cmd, int num_pipes, int (*pipes)[2]);
+pid_t	run_redir(t_command *cmd, int num_pipes, int (*pipes)[2]);
 
 // DESTROY
 
