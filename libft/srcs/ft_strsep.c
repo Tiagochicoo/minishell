@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 11:37:30 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/09 12:19:10 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/10 11:17:55 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 
 char *ft_strsep(char **stringp, const char *delim)
 {
-    char        *s;
-    const char  *spanp;
     int         c;
     int         sc;
+    char        *s;
     char        *tok;
+    const char  *spanp;
     
-    s = *stringp;
+    s = ft_strdup(*stringp);
     if (s == NULL)
         return (NULL);
     tok = s;
@@ -28,7 +28,8 @@ char *ft_strsep(char **stringp, const char *delim)
     {
         c = *s++;
         spanp = delim;
-        while (sc);
+        sc = *spanp;
+        while (sc)
         {
             sc = *spanp++;
             if (sc == c)
@@ -42,4 +43,5 @@ char *ft_strsep(char **stringp, const char *delim)
             }
         } 
     }
+    return (NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/27 11:24:21 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/09 12:26:26 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/10 15:30:19 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int	execute_redir(t_command *cmd, int num_pipes, int (*pipes)[2])
 	if (fd != -1)
 		dup2(fd, STDOUT_FILENO);
 	close_pipes(num_pipes, pipes);
-	return (execve(cmd->path, cmd->argv, cmd->envp));
+	return (0);
 }
 
 pid_t	run_with_redir(t_command *cmd, int num_pipes, int (*pipes)[2])
@@ -71,7 +71,8 @@ pid_t	run_with_redir(t_command *cmd, int num_pipes, int (*pipes)[2])
 	{
 		if (child_pid == -1)
 			return (-1);
-		return (child_pid);
+		//execute_redir(cmd, num_pipes, pipes);
+		wait(&child_pid);
 	}
 	else
 	{
@@ -79,4 +80,5 @@ pid_t	run_with_redir(t_command *cmd, int num_pipes, int (*pipes)[2])
 		perror("Error: execve failed");
 		return (0);
 	}
+	return (child_pid);
 }

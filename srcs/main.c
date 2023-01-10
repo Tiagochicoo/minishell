@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/09 12:46:20 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/10 15:52:54 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,13 +96,14 @@ void	file_exists(t_command *cmd, int bg)
 
 void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 {
-	pid_t childPid;
+	pid_t	child_pid;
 	char	*path;
 
 	path = cmd_argv0;
-	if ((childPid = fork()) < 0)								// fork a child process	
+	child_pid = fork();											// Fork a child process											
+	if (child_pid < 0)
 		error("fork() error");
-	else if (childPid == 0)										// I'm the child and could run a command
+	else if (child_pid == 0)										// I'm the child and could run a command
 	{
 		if (execve(path, cmd->argv, cmd->envp) < 0)				// EXECVE != EXECVP
 		{
@@ -111,34 +112,34 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 		}
 		free(path);
 	}
-	else				// I'm the parent. Shell continues here.
+	else														// I'm the parent. Shell continues here.
 	{
 		 if (bg)
-			printf("Child in background [%d]\n",childPid);
+			printf("Child in background [%d]\n",child_pid);
 		 else
-			wait(&childPid);
+			wait(&child_pid);
 	}
 }
 
-void run_builtin_cmd(t_command *cmd) 
-{
-	if (cmd->builtin == ECHO)
-		echo(cmd);
-	else if (cmd->builtin == CD)
-		cd(cmd);
-	else if (cmd->builtin == PWD)
-		pwd();
-	else if (cmd->builtin == EXPORT)
-		export(cmd);
-	else if (cmd->builtin == ENV)
-		env(cmd->envp);
-	else if (cmd->builtin == UNSET)
-		unset(cmd);
-	else if (cmd->builtin == EXIT)
-		ft_exit(cmd);
-	else if (cmd->builtin == FT)
-		ft_ft();
-}
+// void run_builtin_cmd(t_command *cmd) 
+// {
+// 	if (cmd->builtin == ECHO)
+// 		echo(cmd);
+// 	else if (cmd->builtin == CD)
+// 		cd(cmd);
+// 	else if (cmd->builtin == PWD)
+// 		pwd();
+// 	else if (cmd->builtin == EXPORT)
+// 		export(cmd);
+// 	else if (cmd->builtin == ENV)
+// 		env(cmd->envp);
+// 	else if (cmd->builtin == UNSET)
+// 		unset(cmd);
+// 	else if (cmd->builtin == EXIT)
+// 		ft_exit(cmd);
+// 	else if (cmd->builtin == FT)
+// 		ft_ft();
+// }
 
 // void ft_add_cmd(t_command *head, t_command *cmd)
 // {
@@ -188,26 +189,27 @@ void run_builtin_cmd(t_command *cmd)
 // 	return (cmd);
 // }
 
-// void	run(t_command *cmd)
-// {
-// 	if (cmd->builtin)
-// 		run_builtin_cmd(cmd);
-// 	else
-// 	{
-// 		file_exists(cmd, cmd->background);
-// 		ft_free_cmd(cmd);
-// 	}
-// }
-
-void	execute(t_command *cmd_list)
+void	run(t_command *cmd, int num_pipes, int (*pipes)[2])
 {
-	while (cmd_list->next != NULL)
-	{
-		run(cmd_list);
-		cmd_list = cmd_list->next;
-	}
-	run(cmd_list);
+	// if (cmd->builtin)
+	// 	run_builtin_cmd(cmd);
+	// else
+	// {
+		execute_redir(cmd, num_pipes, pipes);
+		file_exists(cmd, 0);						// cmd + cmd->background
+		ft_free_cmd(cmd);
+	// }
 }
+
+// void	execute(t_command *cmd_list)
+// {
+// 	while (cmd_list->next != NULL)
+// 	{
+// 		run(cmd_list);
+// 		cmd_list = cmd_list->next;
+// 	}
+// 	run(cmd_list);
+// }
 
 // void	evaluate(char *input, char **envp)
 // {
@@ -238,21 +240,14 @@ void	execute(t_command *cmd_list)
 t_command *parse_cmd(char *input)
 {
 	t_command	*cmd;
-	char		*token;
-	char		*copy;
 
-	copy = ft_strdup(input);
 	cmd = calloc(sizeof(t_command) + MAXLINE * sizeof(char *), 1);
-	token = ft_strsep(&copy, " \t\n\r");
-	while (*token)
-	{
-		cmd->name = cmd->argv[0];
-		cmd->redirect[1] = -1;
-		cmd->redirect[0] = -1;
-		cmd->argv = ft_split(input, " \t\n\r");
-		cmd->path = ft_find_cmd(cmd);
-		token = ft_strsep(&copy, " \t\n\r");
-	}
+	cmd->redirect[1] = -1;
+	cmd->redirect[0] = -1;
+	cmd->argv = ft_split(input, " \t\n\r");
+	cmd->name = cmd->argv[0];
+	cmd->path = ft_find_cmd(cmd);
+	cmd->argc = ft_word_count(input, ' ');
 	return (cmd);
 }
 
@@ -292,23 +287,28 @@ void eval(char *input)
 {
 	t_pipeline	*pipeline;
 	int			num_pipes;
-	int			*pipes[2];
+	int			(*pipes)[2];
 	int			i;
 
 	pipeline = parse_pipeline(input);
 	num_pipes = pipeline->num_cmds - 1;
-	*pipes = (int *)calloc(sizeof(int[2]), num_pipes);
+	pipes = calloc(sizeof(int[2]), num_pipes);
 	i = 1;
 	while (i < pipeline->num_cmds)
 	{
 		pipe(pipes[i - 1]);
-		pipeline->cmds[i]->redirect[STDIN_FILENO] = pipes[i - 1][0]; 		// read end of previous pipe
-		pipeline->cmds[i]->redirect[STDOUT_FILENO] = pipes[i][1]; 			// write end of current pipe
+		printf("pipe %d: [%d] [%d]\n", i, pipes[i - 1][0], pipes[i - 1][1]);
+		pipeline->cmds[i]->redirect[STDIN_FILENO] = pipes[i - 1][0];				// read end of previous pipe
+		pipeline->cmds[i - 1]->redirect[STDOUT_FILENO] = pipes[i - 1][1]; 			// write end of current pipe
 		i++;
 	}
 	i = 0;
 	while (i < pipeline->num_cmds)
-		run_redir(pipeline->cmds[i++], num_pipes, pipes);
+		run(pipeline->cmds[i++], num_pipes, pipes);
+
+	for (int i = 0; i < pipeline->num_cmds; ++i) {
+      wait(NULL);
+    }
 }
 
 int	main(int argc, char **argv) 						// don't forget --char **envp-- argument

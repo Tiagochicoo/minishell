@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/20 15:26:48 by tpereira          #+#    #+#             */
-/*   Updated: 2021/07/05 19:47:12 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/10 11:42:32 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ char	*ft_strdup(const char *s)
 	int		i;
 	char	*dup;
 
+	if (s == NULL)
+		return (NULL);
 	dup = (char *)malloc((ft_strlen(s) + 1) * sizeof(char));
 	if (dup == NULL)
 		return (NULL);

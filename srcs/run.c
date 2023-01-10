@@ -6,24 +6,11 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/27 11:35:39 by tpereira          #+#    #+#             */
-/*   Updated: 2022/12/28 09:48:40 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/10 11:12:02 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
-
-void	close_pipes(int num_pipes, int (*pipes)[2])
-{
-	int	i;
-
-	i = 0;
-	while (i < num_pipes)
-	{
-		close(pipes[i][0]);
-		close(pipes[i][1]);
-		i++;
-	}
-}
 
 // void	execute_redir(t_cmd	*cmd, int num_pipes, int (*pipes)[2])
 // {

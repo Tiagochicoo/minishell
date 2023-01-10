@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2023/01/09 12:32:08 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/10 15:45:13 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ typedef struct s_command
 {
 	char		*name;							// command name
 	int			redirect[2];					// redirect input/output
+	int			argc;							// number of arguments in command
 	char		*path;							// path to executable
 	char		**argv;							// arguments list
 	char		**envp;							// environment variables
@@ -100,14 +101,16 @@ char	*ft_find_cmd(t_command *cmd);
 void	file_exists(t_command *cmd, int bg);
 
 // EXECUTOR
-void	run(t_command *cmd);
+void	run(t_command *cmd, int num_pipes, int (*pipes)[2]);
 void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg);
 
 void	ft_ft(void);
 
 // PIPES
 t_pipeline	*parse_pipeline(char *input);
-pid_t	run_redir(t_command *cmd, int num_pipes, int (*pipes)[2]);
+pid_t		run_with_redir(t_command *cmd, int num_pipes, int (*pipes)[2]);
+int			execute_redir(t_command *cmd, int num_pipes, int (*pipes)[2]);
+void		close_pipes(int num_pipes, int (*pipes)[2]);
 
 // DESTROY
 
