@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2023/01/10 16:02:30 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/10 16:56:07 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0);
 void	ft_ft(void);
 
 // PIPES
-t_pipeline	*parse_pipeline(char *input);
+t_pipeline	*parse_pipeline(char *input, char **envp);
 pid_t		run_with_redir(t_command *cmd, int num_pipes, int (*pipes)[2]);
 int			execute_redir(t_command *cmd, int num_pipes, int (*pipes)[2]);
 void		close_pipes(int num_pipes, int (*pipes)[2]);
@@ -115,6 +115,5 @@ void		close_pipes(int num_pipes, int (*pipes)[2]);
 // DESTROY
 
 void    ft_free_cmd(t_command *cmd);
-
 
 #endif

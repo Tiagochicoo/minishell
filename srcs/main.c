@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/10 16:18:13 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/10 17:20:32 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,6 +192,7 @@ void	run(t_command *cmd, int num_pipes, int (*pipes)[2])
 	// 	run_builtin_cmd(cmd);
 	// else
 	// {
+		printf("run()\n");
 		execute_redir(cmd, num_pipes, pipes);
 		ft_free_cmd(cmd);
 	// }
@@ -233,7 +234,7 @@ void	run(t_command *cmd, int num_pipes, int (*pipes)[2])
 // 	}
 // }
 
-t_command *parse_cmd(char *input)
+t_command *parse_cmd(char *input, char **envp)
 {
 	t_command	*cmd;
 
@@ -244,10 +245,11 @@ t_command *parse_cmd(char *input)
 	cmd->name = cmd->argv[0];
 	cmd->path = ft_find_cmd(cmd);
 	cmd->argc = ft_word_count(input, ' ');
+	cmd->envp = envp;
 	return (cmd);
 }
 
-t_pipeline	*parse_pipeline(char *input)
+t_pipeline	*parse_pipeline(char *input, char **envp)
 {
 	t_pipeline	*pipeline;
 	char		*copy;
@@ -273,38 +275,53 @@ t_pipeline	*parse_pipeline(char *input)
 	tmp = ft_strsep(&copy, "|");
 	while (tmp)
 	{
-		pipeline->cmds[i++] = parse_cmd(tmp);
+		pipeline->cmds[i++] = parse_cmd(tmp, envp);
 		tmp = ft_strsep(&copy, "|");
 	}
 	return (pipeline);
 }
 
-void eval(char *input)
+void eval(char *input, char **envp)
 {
 	t_pipeline	*pipeline;
 	int			num_pipes;
 	int			(*pipes)[2];
 	int			i;
 
-	pipeline = parse_pipeline(input);
+	pipeline = parse_pipeline(input, envp);
 	num_pipes = pipeline->num_cmds - 1;
 	pipes = calloc(sizeof(int[2]), num_pipes);
 	i = 1;
 	while (i < pipeline->num_cmds)
 	{
 		pipe(pipes[i - 1]);
+		printf("num_pipes = %d\n", num_pipes);
+		printf("pipe()\n");
+		printf("pipes[0][0] = %d\n", pipes[0][0]);
+		printf("pipes[0][1] = %d\n", pipes[0][1]);
 		printf("pipe %d: [%d] [%d]\n", i, pipes[i - 1][0], pipes[i - 1][1]);
 		pipeline->cmds[i]->redirect[STDIN_FILENO] = pipes[i - 1][0];				// read end of previous pipe
 		pipeline->cmds[i - 1]->redirect[STDOUT_FILENO] = pipes[i - 1][1]; 			// write end of current pipe
+		printf("pipeline->cmds[i]->redirect[STDIN_FILENO] = %d\n", pipeline->cmds[i]->redirect[STDIN_FILENO]);
+		printf("pipeline->cmds[i - 1]->redirect[STDOUT_FILENO] = %d\n", pipeline->cmds[i - 1]->redirect[STDOUT_FILENO]);
 		i++;
 	}
 	i = 0;
 	while (i < pipeline->num_cmds)
-		run(pipeline->cmds[i++], num_pipes, pipes);
-
+	{
+		run(pipeline->cmds[i], num_pipes, pipes);
+		i++;
+	}
+	close_pipes(num_pipes, pipes);
+	i = 0;
+	while (i < pipeline->num_cmds)
+	{
+		wait(NULL);
+		i++;
+	}
 }
 
-int	main(int argc, char **argv) 						// don't forget --char **envp-- argument
+int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp-- argument
 {
 	char	*input;										// buffer for readline
 	char	*cwd;
@@ -330,7 +347,7 @@ int	main(int argc, char **argv) 						// don't forget --char **envp-- argument
 			else if (feof(stdin))
 				exit (0);
 			if (*input)
-				eval(input);						// Evaluate input
+				eval(input, envp);						// Evaluate input
 			free(tmp);
 		}
 	}
