@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/10 15:52:54 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/10 16:18:13 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,24 +77,26 @@ void error(char *msg)
 // 	return is_bg;
 // }
 
-void	file_exists(t_command *cmd, int bg)
+int	file_exists(t_command *cmd)
 {
 	char	*tmp;
 
+	printf("files_exists()\n");
 	tmp = ft_find_cmd(cmd);
 	if (tmp != NULL)
-		run_sys_cmd(cmd, tmp, bg);
+		run_sys_cmd(cmd, tmp);
 	else if (!access(cmd->argv[0], F_OK))
 	{
 		if (!access(cmd->argv[0], X_OK))
-			run_sys_cmd(cmd, cmd->argv[0], bg);
+			run_sys_cmd(cmd, cmd->argv[0]);
 		else
 			perror("Error");
 	}
 	free(tmp);
+	return (0);
 }
 
-void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
+void	run_sys_cmd(t_command *cmd, char *cmd_argv0)
 {
 	pid_t	child_pid;
 	char	*path;
@@ -113,12 +115,7 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0, int bg)
 		free(path);
 	}
 	else														// I'm the parent. Shell continues here.
-	{
-		 if (bg)
-			printf("Child in background [%d]\n",child_pid);
-		 else
-			wait(&child_pid);
-	}
+		wait(&child_pid);									// &child_pid == NULL
 }
 
 // void run_builtin_cmd(t_command *cmd) 
@@ -196,7 +193,6 @@ void	run(t_command *cmd, int num_pipes, int (*pipes)[2])
 	// else
 	// {
 		execute_redir(cmd, num_pipes, pipes);
-		file_exists(cmd, 0);						// cmd + cmd->background
 		ft_free_cmd(cmd);
 	// }
 }
@@ -306,9 +302,6 @@ void eval(char *input)
 	while (i < pipeline->num_cmds)
 		run(pipeline->cmds[i++], num_pipes, pipes);
 
-	for (int i = 0; i < pipeline->num_cmds; ++i) {
-      wait(NULL);
-    }
 }
 
 int	main(int argc, char **argv) 						// don't forget --char **envp-- argument

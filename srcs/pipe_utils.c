@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/27 11:24:21 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/10 15:30:19 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/10 16:06:51 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,16 +50,14 @@ void	close_pipes(int num_pipes, int (*pipes)[2])
 
 int	execute_redir(t_command *cmd, int num_pipes, int (*pipes)[2])
 {
-	int fd;
 
-	fd = cmd->redirect[0];
-	if (fd != -1)
-		dup2(fd, STDIN_FILENO);
-	fd = cmd->redirect[1];	
-	if (fd != -1)
-		dup2(fd, STDOUT_FILENO);
+	if (cmd->redirect[0] != -1)
+		dup2(cmd->redirect[0], STDIN_FILENO);
+	if (cmd->redirect[1] != -1)
+		dup2(cmd->redirect[1], STDOUT_FILENO);
 	close_pipes(num_pipes, pipes);
-	return (0);
+	printf("pipes closed\n");
+	return (file_exists(cmd));
 }
 
 pid_t	run_with_redir(t_command *cmd, int num_pipes, int (*pipes)[2])
