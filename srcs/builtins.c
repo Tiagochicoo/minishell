@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/24 16:39:13 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/11 16:18:16 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/11 16:55:54 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@ void	cd(t_command *cmd)
 		chdir(getenv("HOME"));
 	else if (cmd->argc == 2)
 	{
-		if (ft_strcmp(cmd->argv[1], "-") == 0)
-			chdir(getenv("OLDPWD"));
+		// if (cmd->argv[1][0] == '-')
+		// 	chdir(getenv("OLDPWD"));
 		if (chdir(cmd->argv[1]) == -1)
 			printf("cd: %s: No such file or directory\n", cmd->argv[1]);
 	}

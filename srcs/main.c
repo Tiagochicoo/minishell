@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/11 16:13:13 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/11 16:38:43 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,12 +182,17 @@ int	run_with_fork(t_command *cmd, int num_pipes, int (*pipes)[2])
 t_command *parse_cmd(char *input, char **envp)
 {
 	t_command	*cmd;
+	int			i;
 
+	i = 0;
 	cmd = calloc(sizeof(t_command) + MAXLINE * sizeof(char *), 1);
 	cmd->redirect[1] = -1;
 	cmd->redirect[0] = -1;
 	cmd->argv = ft_split(input, " \t\n\r");
 	cmd->name = cmd->argv[0];
+	while(cmd->argv[i])
+		i++;
+	cmd->argv[i] = NULL;
 	cmd->path = ft_find_cmd(cmd);
 	cmd->builtin = parseBuiltin(cmd);
 	cmd->argc = ft_word_count(input, ' ');
