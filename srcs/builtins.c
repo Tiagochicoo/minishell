@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/24 16:39:13 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/11 08:56:31 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/11 16:18:16 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	echo(t_command *cmd)
 		printf("\n");
 	if (cmd->argv[1] != NULL && ft_strcmp(cmd->argv[1], "-n") == 0)
 		printf("\b");
-	ft_free_cmd(cmd);
+	//ft_free_cmd(cmd);
 }
 
 void	cd(t_command *cmd)
@@ -40,12 +40,14 @@ void	cd(t_command *cmd)
 		chdir(getenv("HOME"));
 	else if (cmd->argc == 2)
 	{
+		if (ft_strcmp(cmd->argv[1], "-") == 0)
+			chdir(getenv("OLDPWD"));
 		if (chdir(cmd->argv[1]) == -1)
 			printf("cd: %s: No such file or directory\n", cmd->argv[1]);
 	}
 	else
 		printf("cd: too many arguments\n");
-	ft_free_cmd(cmd);
+	//ft_free_cmd(cmd);
 }
 
 void	pwd(void)
@@ -84,7 +86,7 @@ void	export(t_command *cmd)
 			printf("export: `%s': not a valid identifier\n", argv);
 		i++;
 	}
-	ft_free_cmd(cmd);
+	//ft_free_cmd(cmd);
 }
 
 void	unset(t_command *cmd)
@@ -94,7 +96,7 @@ void	unset(t_command *cmd)
 	i = 1;
 	while (cmd->argv[i])
 		unsetenv(cmd->argv[i++]);
-	ft_free_cmd(cmd);
+	//ft_free_cmd(cmd);
 }
 
 void	env(char **envp)
@@ -110,7 +112,7 @@ void	ft_exit(t_command *cmd)
 {
 	int num;
 
-	num = 1;
+	num = 2;
 	if (cmd->argc == 1)
 		exit(0);				// need to implement exit status from last command executed
 	else if (cmd->argc == 2)

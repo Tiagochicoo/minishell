@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2023/01/11 15:03:50 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/11 15:50:08 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,15 +92,16 @@ void	pwd(void);
 void	cd(t_command *cmd);
 void	echo(t_command *cmd);
 void	ft_exit(t_command *cmd);
-void	run_builtin_cmd(t_command *cmd);
+pid_t	run_builtin_cmd(t_command *cmd, pid_t child_pid);
 
 // UTILS.C
 char	*ft_relative_path(char *cwd);
 char	*ft_find_cmd(t_command *cmd);
-int		file_exists(t_command *cmd);
+int		file_exists(t_command *cmd, pid_t child_pid);
 
 // EXECUTOR
-int		run(t_command *cmd, int num_pipes, int (*pipes)[2]);
+void	run(t_command *cmd);
+int		run_with_fork(t_command *cmd, int num_pipes, int (*pipes)[2]);
 void	run_sys_cmd(t_command *cmd, pid_t child_pid);
 
 void	ft_ft(void);

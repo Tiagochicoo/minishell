@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/11 15:04:58 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/11 16:13:13 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,21 +77,26 @@ void error(char *msg)
 // 	return is_bg;
 // }
 
-int	file_exists(t_command *cmd)
+int	file_exists(t_command *cmd, pid_t child_pid)
 {
 	char	*tmp;
 
 	tmp = ft_find_cmd(cmd);
 	if (tmp != NULL)
-		run_sys_cmd(cmd, 0);
+	{
+		free(tmp);
+		run_sys_cmd(cmd, child_pid);
+	}
 	else if (!access(cmd->argv[0], F_OK))
 	{
+		free(tmp);
 		if (!access(cmd->argv[0], X_OK))
-			run_sys_cmd(cmd, 0);
+			run_sys_cmd(cmd, child_pid);
 		else
 			perror("Error");
 	}
-	free(tmp);
+	else
+		free(tmp);
 	return (0);
 }
 
@@ -99,14 +104,15 @@ void	run_sys_cmd(t_command *cmd, pid_t child_pid)
 {
 	char	*path;
 
-	//printf("run_sys_cmd\n");
 	path = ft_find_cmd(cmd);
+	if (child_pid == 0)
+		child_pid = fork();
 	if (child_pid < 0)
 		error("fork() error");
 	else if (child_pid == 0)										// I'm the child and could run a command
 	{
 		if (cmd->builtin != NONE)
-			run_builtin_cmd(cmd);
+			run_builtin_cmd(cmd, child_pid);
 		else if (execve(path, cmd->argv, cmd->envp) < 0)				// EXECVE != EXECVP
 		{
 			printf("%sError: command not found: %s%s\n", RED, RESET, cmd->argv[0]);
@@ -118,7 +124,7 @@ void	run_sys_cmd(t_command *cmd, pid_t child_pid)
 		wait(&child_pid);
 }
 
-void run_builtin_cmd(t_command *cmd) 
+pid_t	run_builtin_cmd(t_command *cmd, pid_t child_pid) 
 {
 	if (cmd->builtin == ECHO)
 		echo(cmd);
@@ -136,57 +142,38 @@ void run_builtin_cmd(t_command *cmd)
 		ft_exit(cmd);
 	else if (cmd->builtin == FT)
 		ft_ft();
+	return (child_pid);
 }
 
-// t_command *ft_str2cmd(char *str, t_command *cmd_list)
-// {
-// 	t_command	*cmd;
+void	run(t_command *cmd)
+{
+	if (cmd->builtin != NONE)
+		run_builtin_cmd(cmd, 0);
+	else
+		file_exists(cmd, 0);
+	ft_free_cmd(cmd);
+}
 
-// 	if (!cmd_list->argc)
-// 	{
-// 		cmd = cmd_list;
-// 		cmd->argc = ft_word_count(str, ' ');
-// 		cmd->argv = ft_split(str, " ");
-// 		cmd->background = parse(str, cmd);
-// 		if (cmd->argc)
-// 			cmd->builtin = parseBuiltin(cmd);
-// 		cmd->next = NULL;
-// 	}
-// 	else
-// 	{
-// 		cmd = (t_command *)malloc(sizeof(t_command));
-// 		if (!cmd)
-// 			error("Memory allocation error!");
-// 		cmd->envp = cmd_list->envp;
-// 		cmd->head = cmd_list->head;
-// 		cmd->argc = ft_word_count(str, ' ');
-// 		cmd->argv = ft_split(str, " ");
-// 		cmd->background = parse(str, cmd);
-// 		if (cmd->argc)
-// 			cmd->builtin = parseBuiltin(cmd);
-// 		cmd->next = NULL;		
-// 		cmd_list->next = cmd;
-// 	}
-// 	return (cmd);
-// }
-
-int	run(t_command *cmd, int num_pipes, int (*pipes)[2])
+int	run_with_fork(t_command *cmd, int num_pipes, int (*pipes)[2])
 {
 	pid_t	child_pid;
 
+	if (cmd->builtin != NONE)
+		return (run_builtin_cmd(cmd, 0));
 	child_pid = fork();
 	if (child_pid)
 	{
 		if (child_pid == -1)
 			return (-1);
 		else if (cmd->builtin != NONE)
-			run_builtin_cmd(cmd);
+			return (run_builtin_cmd(cmd, child_pid));
 		return (child_pid);
 	}
 	else
 	{
 		execute_redir(cmd, num_pipes, pipes);
-		run_sys_cmd(cmd, child_pid);
+		file_exists(cmd, child_pid);
+		//run_sys_cmd(cmd, child_pid);
 		return (0);
 	}
 	ft_free_cmd(cmd);
@@ -234,7 +221,6 @@ t_pipeline	*parse_pipeline(char *input, char **envp)
 	tmp = ft_strsep(&copy, "|");
 	while (tmp)
 	{
-		printf("tmp: %s\n", tmp);
 		pipeline->cmds[i++] = parse_cmd(tmp, envp);
 		tmp = ft_strsep(&copy, "|");
 	}
@@ -291,11 +277,11 @@ void eval(char *input, char **envp)
 	}
 	//print_pipeline(pipeline);
 	i = 0;
-	while (i < pipeline->num_cmds)
-	{
-		run(pipeline->cmds[i], num_pipes, pipes);
-		i++;
-	}
+	if (pipeline->num_cmds == 1)
+		run(pipeline->cmds[0]);
+	else
+		while (i < pipeline->num_cmds)
+			run_with_fork(pipeline->cmds[i++], num_pipes, pipes);
 	close_pipes(num_pipes, pipes);
 	i = 0;
 	while (i < pipeline->num_cmds)
@@ -320,6 +306,7 @@ int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp
 		{
 			tmp = getcwd(NULL, 0);
 			cwd = ft_relative_path(tmp);
+			printf("%ld%ld ", (long)getpid(), (long)getppid());
 			printf("%s➜%s %s%s%s ", BLUE, RESET, GREEN, cwd, RESET);
 			free(cwd);
 			input = readline(YELLOW "~" RESET " ");
