@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/11 11:50:02 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/11 15:04:58 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,11 +83,11 @@ int	file_exists(t_command *cmd)
 
 	tmp = ft_find_cmd(cmd);
 	if (tmp != NULL)
-		run_sys_cmd(cmd);
+		run_sys_cmd(cmd, 0);
 	else if (!access(cmd->argv[0], F_OK))
 	{
 		if (!access(cmd->argv[0], X_OK))
-			run_sys_cmd(cmd);
+			run_sys_cmd(cmd, 0);
 		else
 			perror("Error");
 	}
@@ -95,13 +95,12 @@ int	file_exists(t_command *cmd)
 	return (0);
 }
 
-void	run_sys_cmd(t_command *cmd)
+void	run_sys_cmd(t_command *cmd, pid_t child_pid)
 {
-	pid_t	child_pid;
 	char	*path;
 
+	//printf("run_sys_cmd\n");
 	path = ft_find_cmd(cmd);
-	child_pid = fork();											// Fork a child process											
 	if (child_pid < 0)
 		error("fork() error");
 	else if (child_pid == 0)										// I'm the child and could run a command
@@ -139,22 +138,6 @@ void run_builtin_cmd(t_command *cmd)
 		ft_ft();
 }
 
-// void ft_add_cmd(t_command *head, t_command *cmd)
-// {
-// 	t_command tmp;
-
-// 	tmp = *head;
-// 	if (tmp.argv == NULL)
-// 		head = cmd;
-// 	else
-// 	{
-// 		while (tmp.next != NULL)
-// 			tmp = *tmp.next;
-// 		tmp.next = cmd;
-// 	}
-// 	cmd->next = NULL;
-// }
-
 // t_command *ft_str2cmd(char *str, t_command *cmd_list)
 // {
 // 	t_command	*cmd;
@@ -187,56 +170,27 @@ void run_builtin_cmd(t_command *cmd)
 // 	return (cmd);
 // }
 
-void	run(t_command *cmd, int num_pipes, int (*pipes)[2])
+int	run(t_command *cmd, int num_pipes, int (*pipes)[2])
 {
-	if (cmd->builtin)
+	pid_t	child_pid;
+
+	child_pid = fork();
+	if (child_pid)
 	{
-		execute_redir(cmd, num_pipes, pipes);
-		run_builtin_cmd(cmd);
+		if (child_pid == -1)
+			return (-1);
+		else if (cmd->builtin != NONE)
+			run_builtin_cmd(cmd);
+		return (child_pid);
 	}
 	else
 	{
 		execute_redir(cmd, num_pipes, pipes);
-		run_sys_cmd(cmd);
-		ft_free_cmd(cmd);
+		run_sys_cmd(cmd, child_pid);
+		return (0);
 	}
+	ft_free_cmd(cmd);
 }
-
-// void	execute(t_command *cmd_list)
-// {
-// 	while (cmd_list->next != NULL)
-// 	{
-// 		run(cmd_list);
-// 		cmd_list = cmd_list->next;
-// 	}
-// 	run(cmd_list);
-// }
-
-// void	evaluate(char *input, char **envp)
-// {
-// 	t_pipeline	*pipeline;										// parsed commands linked list
-// 	int			num_pipes;										// number of pipes in input
-// 	int			(*pipes)[2];									// pipe file descriptors
-// 	int			i;
-
-// 	pipeline = parse_pipeline(input);
-// 	num_pipes = pipeline->num_cmds - 1;
-// 	pipes = calloc(sizeof(int[2]), num_pipes);
-// 	i = 1;
-// 	while (i < pipeline->num_cmds)
-// 	{
-// 		pipe(pipes[i - 1]);
-// 		pipeline->cmds[i]->redirect[STDIN_FILENO] = pipes[i - 1][0]; 		// read end of previous pipe
-// 		pipeline->cmds[i]->redirect[STDOUT_FILENO] = pipes[i][1]; 			// write end of current pipe
-// 		i++;
-// 	}
-// 	i = 0;
-// 	while (i < pipeline->num_cmds)
-// 	{
-// 		run_redir(pipeline->cmds[i], num_pipes, pipes);
-// 		i++;
-// 	}
-// }
 
 t_command *parse_cmd(char *input, char **envp)
 {
@@ -275,11 +229,12 @@ t_pipeline	*parse_pipeline(char *input, char **envp)
 	}
 	copy = tmp;
 	num_cmds++;
-	pipeline = calloc(sizeof(t_pipeline) + num_cmds * sizeof(t_command*), 1); 
+	pipeline = calloc(sizeof(t_pipeline) + num_cmds * sizeof(t_command*), 1);
 	pipeline->num_cmds = num_cmds;
 	tmp = ft_strsep(&copy, "|");
 	while (tmp)
 	{
+		printf("tmp: %s\n", tmp);
 		pipeline->cmds[i++] = parse_cmd(tmp, envp);
 		tmp = ft_strsep(&copy, "|");
 	}
@@ -289,30 +244,31 @@ t_pipeline	*parse_pipeline(char *input, char **envp)
 // Helper function to print a command struct
 
 void print_command(t_command* command) {
-  char** arg = command->argv;
-  int i = 0;
+	char** arg = command->argv;
+	int i = 0;
 
-  printf("progname: %s\n", command->name);
-  printf("redirect[0]: %d\n", command->redirect[0]);
-  printf("redirect[1]: %d\n", command->redirect[1]);
-  while (arg[i] != NULL) 
-  {
-	printf("argv[%d]: %s\n", i, arg[i]);
-	++i;
-  }
+	printf("progname: %s\n", command->name);
+	printf("redirect[0]: %d\n", command->redirect[0]);
+	printf("redirect[1]: %d\n", command->redirect[1]);
+	while (arg[i] != NULL) 
+	{
+		printf("argv[%d]: %s\n", i, arg[i]);
+		++i;
+	}
 }
 
-void print_pipeline(t_pipeline* pipeline) {
-  t_command** cmd = pipeline->cmds;
-  int i = 0;
+void print_pipeline(t_pipeline* pipeline) 
+{
+	t_command** cmd = pipeline->cmds;
+	int i = 0;
 
-  printf("num_cmds: %d\n", pipeline->num_cmds);
+	printf("num_cmds: %d\n", pipeline->num_cmds);
 
-  for (i = 0; i < pipeline->num_cmds; ++i) 
-  {
-    printf("cmds[%d]:\n", i);
-    print_command(cmd[i]);
-  }
+	for (i = 0; i < pipeline->num_cmds; ++i) 
+	{
+		printf("cmds[%d]:\n", i);
+		print_command(cmd[i]);
+	}
 }
 
 void eval(char *input, char **envp)
@@ -347,6 +303,8 @@ void eval(char *input, char **envp)
 		wait(NULL);
 		i++;
 	}
+	//ft_free_pipeline(pipeline);
+	free(pipeline);
 }
 
 int	main(int argc, char **argv, char **envp) 						// don't forget --char **envp-- argument

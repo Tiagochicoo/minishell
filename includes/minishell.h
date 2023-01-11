@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2023/01/11 11:49:05 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/11 15:03:50 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,6 @@ typedef struct s_command
 	char		**argv;							// arguments list
 	char		**envp;							// environment variables
 	t_builtin	builtin;						// is argv[0] a builtin command?
-	struct s_command	*next;					// next command in pipeline
-	struct s_command	*head;					// head of the pipeline
 }			t_command;	
 
 typedef struct s_cmd
@@ -102,8 +100,8 @@ char	*ft_find_cmd(t_command *cmd);
 int		file_exists(t_command *cmd);
 
 // EXECUTOR
-void	run(t_command *cmd, int num_pipes, int (*pipes)[2]);
-void	run_sys_cmd(t_command *cmd);
+int		run(t_command *cmd, int num_pipes, int (*pipes)[2]);
+void	run_sys_cmd(t_command *cmd, pid_t child_pid);
 
 void	ft_ft(void);
 
@@ -116,5 +114,6 @@ void		close_pipes(int num_pipes, int (*pipes)[2]);
 // DESTROY
 
 void    ft_free_cmd(t_command *cmd);
+void	ft_free_pipeline(t_pipeline *pipeline);
 
 #endif

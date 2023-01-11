@@ -6,34 +6,25 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/27 11:24:21 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/11 10:46:04 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/11 14:21:14 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-// t_pipeline *parse_pipeline(char *input, char **envp)
-// {
-// 	char		*temp;
-// 	char		*current;
-// 	int			num_cmds;
-// 	t_pipeline	*pipeline;
+void	ft_free_pipeline(t_pipeline *pipeline)
+{
+	int i;
 
-// 	num_cmds = 0;
-// 	temp = ft_strdup(input);
-// 	current = temp;
-// 	while(*current)
-// 	{
-// 		if (*current == '|')
-// 			num_cmds++;
-// 		current++;
-// 	}
-// 	num_cmds++;
-// 	pipeline = ft_calloc(sizeof(t_pipeline) + num_cmds * sizeof(t_command *), 1);
-// 	pipeline->num_cmds = num_cmds;
-// 	pipeline->envp = envp;
-// 	return (pipeline);
-// }
+	i = 0;
+	while (i < pipeline->num_cmds)
+	{
+		ft_free_cmd(pipeline->cmds[i]);
+		i++;
+	}
+	free(pipeline->cmds);
+	free(pipeline);
+}
 
 void	close_pipes(int num_pipes, int (*pipes)[2])
 {
@@ -55,7 +46,6 @@ int	execute_redir(t_command *cmd, int num_pipes, int (*pipes)[2])
 	if (cmd->redirect[1] != -1)
 		dup2(cmd->redirect[1], STDOUT_FILENO);
 	close_pipes(num_pipes, pipes);
-	//file_exists(cmd);
 	return (0);
 }
 
