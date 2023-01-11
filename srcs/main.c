@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/23 16:01:56 by tpereira          #+#    #+#             */
-/*   Updated: 2023/01/10 17:20:32 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/11 11:50:02 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,14 +81,13 @@ int	file_exists(t_command *cmd)
 {
 	char	*tmp;
 
-	printf("files_exists()\n");
 	tmp = ft_find_cmd(cmd);
 	if (tmp != NULL)
-		run_sys_cmd(cmd, tmp);
+		run_sys_cmd(cmd);
 	else if (!access(cmd->argv[0], F_OK))
 	{
 		if (!access(cmd->argv[0], X_OK))
-			run_sys_cmd(cmd, cmd->argv[0]);
+			run_sys_cmd(cmd);
 		else
 			perror("Error");
 	}
@@ -96,18 +95,20 @@ int	file_exists(t_command *cmd)
 	return (0);
 }
 
-void	run_sys_cmd(t_command *cmd, char *cmd_argv0)
+void	run_sys_cmd(t_command *cmd)
 {
 	pid_t	child_pid;
 	char	*path;
 
-	path = cmd_argv0;
+	path = ft_find_cmd(cmd);
 	child_pid = fork();											// Fork a child process											
 	if (child_pid < 0)
 		error("fork() error");
 	else if (child_pid == 0)										// I'm the child and could run a command
 	{
-		if (execve(path, cmd->argv, cmd->envp) < 0)				// EXECVE != EXECVP
+		if (cmd->builtin != NONE)
+			run_builtin_cmd(cmd);
+		else if (execve(path, cmd->argv, cmd->envp) < 0)				// EXECVE != EXECVP
 		{
 			printf("%sError: command not found: %s%s\n", RED, RESET, cmd->argv[0]);
 			exit(0);
@@ -115,28 +116,28 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0)
 		free(path);
 	}
 	else														// I'm the parent. Shell continues here.
-		wait(&child_pid);									// &child_pid == NULL
+		wait(&child_pid);
 }
 
-// void run_builtin_cmd(t_command *cmd) 
-// {
-// 	if (cmd->builtin == ECHO)
-// 		echo(cmd);
-// 	else if (cmd->builtin == CD)
-// 		cd(cmd);
-// 	else if (cmd->builtin == PWD)
-// 		pwd();
-// 	else if (cmd->builtin == EXPORT)
-// 		export(cmd);
-// 	else if (cmd->builtin == ENV)
-// 		env(cmd->envp);
-// 	else if (cmd->builtin == UNSET)
-// 		unset(cmd);
-// 	else if (cmd->builtin == EXIT)
-// 		ft_exit(cmd);
-// 	else if (cmd->builtin == FT)
-// 		ft_ft();
-// }
+void run_builtin_cmd(t_command *cmd) 
+{
+	if (cmd->builtin == ECHO)
+		echo(cmd);
+	else if (cmd->builtin == CD)
+		cd(cmd);
+	else if (cmd->builtin == PWD)
+		pwd();
+	else if (cmd->builtin == EXPORT)
+		export(cmd);
+	else if (cmd->builtin == ENV)
+		env(cmd->envp);
+	else if (cmd->builtin == UNSET)
+		unset(cmd);
+	else if (cmd->builtin == EXIT)
+		ft_exit(cmd);
+	else if (cmd->builtin == FT)
+		ft_ft();
+}
 
 // void ft_add_cmd(t_command *head, t_command *cmd)
 // {
@@ -188,14 +189,17 @@ void	run_sys_cmd(t_command *cmd, char *cmd_argv0)
 
 void	run(t_command *cmd, int num_pipes, int (*pipes)[2])
 {
-	// if (cmd->builtin)
-	// 	run_builtin_cmd(cmd);
-	// else
-	// {
-		printf("run()\n");
+	if (cmd->builtin)
+	{
 		execute_redir(cmd, num_pipes, pipes);
+		run_builtin_cmd(cmd);
+	}
+	else
+	{
+		execute_redir(cmd, num_pipes, pipes);
+		run_sys_cmd(cmd);
 		ft_free_cmd(cmd);
-	// }
+	}
 }
 
 // void	execute(t_command *cmd_list)
@@ -244,6 +248,7 @@ t_command *parse_cmd(char *input, char **envp)
 	cmd->argv = ft_split(input, " \t\n\r");
 	cmd->name = cmd->argv[0];
 	cmd->path = ft_find_cmd(cmd);
+	cmd->builtin = parseBuiltin(cmd);
 	cmd->argc = ft_word_count(input, ' ');
 	cmd->envp = envp;
 	return (cmd);
@@ -281,6 +286,35 @@ t_pipeline	*parse_pipeline(char *input, char **envp)
 	return (pipeline);
 }
 
+// Helper function to print a command struct
+
+void print_command(t_command* command) {
+  char** arg = command->argv;
+  int i = 0;
+
+  printf("progname: %s\n", command->name);
+  printf("redirect[0]: %d\n", command->redirect[0]);
+  printf("redirect[1]: %d\n", command->redirect[1]);
+  while (arg[i] != NULL) 
+  {
+	printf("argv[%d]: %s\n", i, arg[i]);
+	++i;
+  }
+}
+
+void print_pipeline(t_pipeline* pipeline) {
+  t_command** cmd = pipeline->cmds;
+  int i = 0;
+
+  printf("num_cmds: %d\n", pipeline->num_cmds);
+
+  for (i = 0; i < pipeline->num_cmds; ++i) 
+  {
+    printf("cmds[%d]:\n", i);
+    print_command(cmd[i]);
+  }
+}
+
 void eval(char *input, char **envp)
 {
 	t_pipeline	*pipeline;
@@ -295,17 +329,11 @@ void eval(char *input, char **envp)
 	while (i < pipeline->num_cmds)
 	{
 		pipe(pipes[i - 1]);
-		printf("num_pipes = %d\n", num_pipes);
-		printf("pipe()\n");
-		printf("pipes[0][0] = %d\n", pipes[0][0]);
-		printf("pipes[0][1] = %d\n", pipes[0][1]);
-		printf("pipe %d: [%d] [%d]\n", i, pipes[i - 1][0], pipes[i - 1][1]);
 		pipeline->cmds[i]->redirect[STDIN_FILENO] = pipes[i - 1][0];				// read end of previous pipe
 		pipeline->cmds[i - 1]->redirect[STDOUT_FILENO] = pipes[i - 1][1]; 			// write end of current pipe
-		printf("pipeline->cmds[i]->redirect[STDIN_FILENO] = %d\n", pipeline->cmds[i]->redirect[STDIN_FILENO]);
-		printf("pipeline->cmds[i - 1]->redirect[STDOUT_FILENO] = %d\n", pipeline->cmds[i - 1]->redirect[STDOUT_FILENO]);
 		i++;
 	}
+	//print_pipeline(pipeline);
 	i = 0;
 	while (i < pipeline->num_cmds)
 	{

@@ -6,7 +6,7 @@
 /*   By: tpereira <tpereira@42Lisboa.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 12:08:18 by tiago             #+#    #+#             */
-/*   Updated: 2023/01/10 16:56:07 by tpereira         ###   ########.fr       */
+/*   Updated: 2023/01/11 11:49:05 by tpereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ void	pwd(void);
 void	cd(t_command *cmd);
 void	echo(t_command *cmd);
 void	ft_exit(t_command *cmd);
+void	run_builtin_cmd(t_command *cmd);
 
 // UTILS.C
 char	*ft_relative_path(char *cwd);
@@ -102,7 +103,7 @@ int		file_exists(t_command *cmd);
 
 // EXECUTOR
 void	run(t_command *cmd, int num_pipes, int (*pipes)[2]);
-void	run_sys_cmd(t_command *cmd, char *cmd_argv0);
+void	run_sys_cmd(t_command *cmd);
 
 void	ft_ft(void);
 
